@@ -30,7 +30,7 @@ matching repo folder) when configuring the sync script.
 
 ```text
 Decision Tree:
-├── Category is moba/? → publishable: false (company-specific)
+├── Category is work/project-specific? → publishable: false (company-specific)
 ├── Contains proprietary info? → publishable: false
 ├── Contains company examples? → publishable: "review" (generalize examples)
 ├── No external references? → publishable: "review" (needs-references)
@@ -49,7 +49,7 @@ transferable**, generalize the examples to make them blog-publishable:
 | S3 buckets    | `arch-amplitude-storage` | `amplitude-raw-bucket` |
 | Internal URLs | `api.company.com`        | `api.example.com`      |
 | Emails        | `john@company.com`       | `user@example.com`     |
-| DB names      | `moba_production`        | `app_production`       |
+| DB names      | `myproject_production`   | `app_production`       |
 
 **Use `{PLACEHOLDER}` syntax** for values readers should replace.
 

@@ -23,7 +23,7 @@ Load during execution:
 | File                                                      | Use During | Contains                                      |
 | --------------------------------------------------------- | ---------- | --------------------------------------------- |
 | [translation-guide.md](./references/translation-guide.md) | All steps  | Korean translation rules, tone, anti-patterns |
-| `~/dev/personal/3b/personal/writing-examples/*.md`        | Step 2     | Brandon's Korean voice samples (calibration)  |
+| `${FORGE_3B_ROOT}/personal/writing-examples/*.md`         | Step 2     | Maintainer's Korean voice samples (optional)  |
 
 ## Execution Steps
 
@@ -46,9 +46,10 @@ If the source is a blog post file (in `src/content/posts/en/`), default to
 **Read [references/translation-guide.md](./references/translation-guide.md)
 before starting.**
 
-1. Read all files in `~/dev/personal/3b/personal/writing-examples/` (most recent
-   first)
-2. Absorb Brandon's natural Korean writing patterns:
+1. Read all files in `${FORGE_3B_ROOT}/personal/writing-examples/` if the
+   directory exists (most recent first). If not, skip voice calibration — the
+   translation will use standard natural Korean patterns.
+2. Absorb the maintainer's natural Korean writing patterns:
    - Vocabulary choices and English-Korean mixing style
    - Sentence structure and connective patterns
    - Level of directness and technical terminology usage

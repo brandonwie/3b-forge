@@ -166,10 +166,10 @@ a single command or trivial edit — full removal takes under a minute.
 rm -rf ~/.agents/skills/firecrawl*
 
 # 2. Dangling symlinks in 3B
-rm ~/dev/personal/3b/.claude/skills/firecrawl*
+rm ${FORGE_3B_ROOT}/.claude/skills/firecrawl*
 
 # 3. This rule file
-rm ~/dev/personal/3b/.claude/rules/firecrawl-usage.md
+rm ${FORGE_3B_ROOT}/.claude/rules/firecrawl-usage.md
 
 # 4. Pointer line in 3B CLAUDE.md — edit 3b/CLAUDE.md and remove the two-line
 #    pointer that references firecrawl-usage.md (under "## Skill Routing")
