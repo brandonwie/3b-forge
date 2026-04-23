@@ -17,6 +17,25 @@ Rather than maintain two parallel plugin trees (`3b-public/` + `3b-private/`),
 we keep one tree and split by **gitignore**. Public content is committed;
 private content is staged locally but blocked from Git.
 
+## Architectural constraint: one plugin directory
+
+`plugins/3b/` holds **all** Forge plugin content — not only 3B-coupled
+items. This is a hard requirement of Claude Code's plugin spec, not a
+stylistic choice:
+
+- The slash-command namespace (`/3b:*`) is driven by the `"name"` field
+  in `.claude-plugin/plugin.json`.
+- Plugin names are globally unique, and there is no cross-directory
+  manifest merging.
+- Therefore all `/3b:*` commands must physically live inside **one**
+  plugin directory.
+
+Consequence: portable skills (e.g. `interview`, `clarify`, `investigate`)
+and 3B-coupled skills (e.g. `wrap`, `clean-actives`) both live under
+`plugins/3b/`. The Tier-A / Tier-B / Tier-C classification below is the
+mechanism that separates **ship-worthy** from **locally-staged** content,
+not the directory layout.
+
 ## The rule
 
 Inside `plugins/3b/`:
