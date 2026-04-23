@@ -13,10 +13,8 @@ future AI agent host that can read markdown-based skills.
 | Path | Purpose | Status |
 |---|---|---|
 | [`plugins/3b/`](./plugins/3b/) | The consolidated `3b` plugin. Ships `/3b:interview` (Socratic requirement interview) with a conversational layer (SKILL.md + 7 agent prompts) AND an optional Python engine (`engine/`) for programmatic integrators. | `v0.0.1` — pre-release |
-| [`archive/plugins/`](./archive/plugins/) | Historical snapshots of the two design-axis experiments (`interview-claude-v0.0.1`, `interview-codex-v0.1.0`) that informed the consolidation. Not installable. | reference |
-| [`docs/interview-skill/`](./docs/interview-skill/) | 10 markdown files analyzing the upstream Ouroboros interview skill — overview, routing decision tree, rhythm guard, ambiguity scoring, persistence, agents/perspectives, PM variant, customization, plugin build decisions (EN + KO) | reference |
-| [`consolidated-plan.md`](./consolidated-plan.md) | Executable v0.0.1 → v0.1.0 plan. See the ⚠️ REVISION banner at top for the adjudication trail. | active |
-| [`review-from-claude.md`](./review-from-claude.md), [`review-from-codex.md`](./review-from-codex.md) | Cross-variant self-reviews that seeded the consolidation. | reference |
+| [`todos.md`](./todos.md) | Near-term backlog for the forge. | active |
+| [`CHANGELOG.md`](./CHANGELOG.md) | Release history. | active |
 
 ## Layout
 
@@ -31,16 +29,7 @@ future AI agent host that can read markdown-based skills.
 │       ├── commands/                # slash-command stubs
 │       ├── engine/                  # optional Python layer (interview_plugin_core)
 │       └── README.md
-├── archive/
-│   ├── README.md
-│   └── plugins/
-│       ├── interview-claude-v0.0.1/ # prompt-heavy variant (README-only marker)
-│       └── interview-codex-v0.1.0/  # engine-heavy variant (README-only marker)
-├── docs/interview-skill/            # 10 analysis docs (EN + KO where applicable)
-├── consolidated-plan.md             # v0.0.1 → v0.1.0 roadmap + REVISION trail
-├── review-from-claude.md            # cross-variant self-reviews
-├── review-from-codex.md
-├── todos.md                         # near-term backlog + adjudication block
+├── todos.md                         # near-term backlog
 ├── CHANGELOG.md
 ├── LICENSE                          # MIT
 └── README.md                        # this file
@@ -48,15 +37,8 @@ future AI agent host that can read markdown-based skills.
 
 ## Why ONE plugin with two layers, not two sibling plugins
 
-The harness previously held two parallel variants (`interview-claude`
-authored as a prompt-heavy markdown skill, `interview-codex` as a
-Python-engine extraction). A full cross-variant review cycle produced
-an initial adjudication — "keep both as canonical siblings" — that was
-wrong. The real goal: **one plugin users can install that works
-wherever their agent host runs**.
-
-The revised architecture keeps both surfaces (prompt-heavy + engine-
-heavy) but inside **one** plugin as two **layers**:
+The plugin keeps both prompt-heavy and engine-heavy surfaces inside
+**one** installable as two **layers**:
 
 - **Conversational layer** — `skills/interview/SKILL.md` + the 7
   prompts under `agents/`. Zero runtime deps. Works on any AI agent
@@ -68,28 +50,19 @@ heavy) but inside **one** plugin as two **layers**:
   `LLMAdapter` protocol. 60+ pytest-asyncio tests. Loads prompts
   from the shared `agents/` directory — no duplication.
 
-The two archived variants live at `archive/plugins/` with explanatory
-READMEs so the design-journey context stays visible.
-
 ## Roadmap
 
 ### v0.0.1 → v0.1.0 (current focus)
 
 Graduation criteria documented in
-[`plugins/3b/README.md`](./plugins/3b/README.md). Outstanding items
-(from [`consolidated-plan.md`](./consolidated-plan.md) Workstreams B + D):
+[`plugins/3b/README.md`](./plugins/3b/README.md). Outstanding items:
 
 - [ ] Validate perspective-rotation decision table in SKILL.md §B.6 via
   golden transcripts (greenfield + brownfield).
 - [ ] Add per-dimension observable-signal rubric to `seed-closer.md`.
 - [ ] Document session-continuity transcript convention (path under
   `projects/*/actives/` + frontmatter schema).
-- [ ] Write `docs/interview-skill/10-variant-comparison.md` describing
-  the two-layer architecture (why one plugin, not two).
-- [ ] Write `docs/interview-skill/11-direction-decision.md` as the
-  formal ADR for the SSoT consolidation.
-- [ ] 2+ golden transcript fixtures under
-  `docs/interview-skill/fixtures/`.
+- [ ] 2+ golden transcript fixtures under `plugins/3b/fixtures/`.
 - [ ] Cross-host install flow verified end-to-end on Claude Code + Codex.
 
 ### Post-v0.1.0 (speculative)

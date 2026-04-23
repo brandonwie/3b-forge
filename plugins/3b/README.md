@@ -4,10 +4,7 @@ Single Source of Truth for the harness. One plugin, many skills. Works
 across Claude Code, Codex, Gemini CLI, and any future AI agent host
 that can read markdown-based skills.
 
-> **Status:** `v0.0.1` — **pre-release**. Lifted from the cross-variant
-> review cycle (see [`/archive/plugins/`](../../archive/plugins/) for
-> the superseded `interview-claude-v0.0.1` and `interview-codex-v0.1.0`
-> snapshots plus the adjudication that led here).
+> **Status:** `v0.0.1` — **pre-release**.
 
 ## Current skills
 
@@ -80,7 +77,7 @@ Bump to `v0.1.0` when ready-to-use-out-of-the-box as a harness library:
    (Gemini support remains best-effort until its plugin format
    stabilizes).
 5. At least 2 golden transcript fixtures under
-   `docs/interview-skill/fixtures/` (greenfield + brownfield).
+   `plugins/3b/fixtures/` (greenfield + brownfield).
 6. Python engine's ontologist perspective lands and its tests pass.
 
 ## File layout
