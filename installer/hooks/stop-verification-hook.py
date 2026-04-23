@@ -9,8 +9,11 @@ import subprocess
 import os
 import sys
 
-BUFFER_PATH = os.path.expanduser("~/dev/personal/3b/.claude/buffer.md")
-THREE_B_PATH = os.path.expanduser("~/dev/personal/3b")
+# 3B is opt-in via env var. Unset → buffer/3B checks skipped silently.
+THREE_B_PATH = os.environ.get("FORGE_3B_ROOT") or None
+BUFFER_PATH = (
+    os.path.join(THREE_B_PATH, ".claude", "buffer.md") if THREE_B_PATH else None
+)
 
 warnings = []
 
@@ -34,6 +37,8 @@ def check_git_status():
 
 def check_buffer():
     """Check if buffer.md has unprocessed entries."""
+    if not BUFFER_PATH:
+        return
     try:
         if os.path.exists(BUFFER_PATH):
             with open(BUFFER_PATH, "r") as f:
@@ -53,6 +58,8 @@ def check_buffer():
 
 def check_3b_uncommitted():
     """Check if 3B repo has uncommitted changes."""
+    if not THREE_B_PATH:
+        return
     try:
         result = subprocess.run(
             ["git", "-C", THREE_B_PATH, "status", "--porcelain"],
@@ -70,6 +77,8 @@ def check_3b_uncommitted():
 
 def check_friction_reminder():
     """Soft reminder to tag friction entries if session had errors."""
+    if not BUFFER_PATH:
+        return
     try:
         if os.path.exists(BUFFER_PATH):
             with open(BUFFER_PATH, "r") as f:

@@ -10,9 +10,10 @@ Surfaces:
 Usage:
   python3 verify-registry.py [--settings PATH] [--registry PATH]
 
-Defaults:
-  --settings  ~/dev/personal/3b/.claude/global-claude-setup/settings.json
-  --registry  ~/dev/personal/3b/projects/3b/reference/hooks-registry.md
+Defaults resolve from $FORGE_3B_ROOT:
+  --settings  $FORGE_3B_ROOT/.claude/global-claude-setup/settings.json
+  --registry  $FORGE_3B_ROOT/projects/3b/reference/hooks-registry.md
+If FORGE_3B_ROOT is not set, both --settings and --registry must be passed.
 """
 import argparse
 import json
@@ -93,20 +94,25 @@ def extract_scripts_from_registry(registry_path):
 
 
 def main():
+    forge_3b_root = os.environ.get("FORGE_3B_ROOT")
+    default_settings = (
+        os.path.join(forge_3b_root, ".claude/global-claude-setup/settings.json")
+        if forge_3b_root else None
+    )
+    default_registry = (
+        os.path.join(forge_3b_root, "projects/3b/reference/hooks-registry.md")
+        if forge_3b_root else None
+    )
+
     parser = argparse.ArgumentParser(description="Hook registry verification")
-    parser.add_argument(
-        "--settings",
-        default=os.path.expanduser(
-            "~/dev/personal/3b/.claude/global-claude-setup/settings.json"
-        ),
-    )
-    parser.add_argument(
-        "--registry",
-        default=os.path.expanduser(
-            "~/dev/personal/3b/projects/3b/reference/hooks-registry.md"
-        ),
-    )
+    parser.add_argument("--settings", default=default_settings)
+    parser.add_argument("--registry", default=default_registry)
     args = parser.parse_args()
+
+    if not args.settings or not args.registry:
+        parser.error(
+            "--settings and --registry are required when FORGE_3B_ROOT is not set"
+        )
 
     if not os.path.exists(args.settings):
         print(f"Error: {args.settings} not found", file=sys.stderr)
