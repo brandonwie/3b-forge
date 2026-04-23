@@ -1,4 +1,4 @@
-# 3b — the consolidated 3b-harness plugin
+# 3b — the consolidated 3b-forge plugin
 
 Single Source of Truth for the harness. One plugin, many skills. Works
 across Claude Code, Codex, Gemini CLI, and any future AI agent host

@@ -1,4 +1,4 @@
-# 3b-harness
+# 3b-forge
 
 Personal workspace for the **`3b`** cross-agent plugin — built and
 maintained for Claude Code, Codex, Gemini CLI, and (in principle) any
@@ -21,7 +21,7 @@ future AI agent host that can read markdown-based skills.
 ## Layout
 
 ```
-3b-harness/
+3b-forge/
 ├── plugins/
 │   └── 3b/                          # the consolidated cross-agent plugin
 │       ├── .claude-plugin/          # Claude Code manifest
@@ -113,7 +113,7 @@ Graduation criteria documented in
 Claude Code users:
 
 ```bash
-claude plugin marketplace add brandonwie/3b-harness
+claude plugin marketplace add brandonwie/3b-forge
 claude plugin install 3b
 ```
 

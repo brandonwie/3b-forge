@@ -1,11 +1,11 @@
 ---
-tags: [todos, 3b-harness]
+tags: [todos, 3b-forge]
 created: 2026-04-23
 updated: 2026-04-23
 status: in-progress
 ---
 
-# 3b-harness — TODOs
+# 3b-forge — TODOs
 
 Near-term action backlog for the harness. Tracked here (not in GitHub
 Issues) because this is a personal workspace.
@@ -117,53 +117,53 @@ and will not continue.
 
 ### 3B integration — **priority** (do early; pays off every session after)
 
-Without this, every `/wrap` that touches 3b-harness has to manually
+Without this, every `/wrap` that touches 3b-forge has to manually
 scope which changes go where and can't auto-populate the ACTIVE-STATUS
-"Work" table with 3b-harness tasks. With proper 3B wiring, all of that
+"Work" table with 3b-forge tasks. With proper 3B wiring, all of that
 becomes automatic.
 
-- [ ] **Run `/init-3b` inside 3b-harness** to wire it into the 3B
+- [ ] **Run `/init-3b` inside 3b-forge** to wire it into the 3B
   knowledge system. This creates:
-  - `3b/.claude/project-claude/3b-harness.md` (project CLAUDE.md
+  - `3b/.claude/project-claude/3b-forge.md` (project CLAUDE.md
     source; the repo's `CLAUDE.md` becomes a symlink to this)
-  - `3b/.claude/prompts/3b-harness/PROJECT-CONFIG.md` (tells skills
+  - `3b/.claude/prompts/3b-forge/PROJECT-CONFIG.md` (tells skills
     where to find todos, PROGRESS, actives, docs paths)
-  - `3b/projects/3b-harness/` (personal docs + task tracking —
+  - `3b/projects/3b-forge/` (personal docs + task tracking —
     `todos.md`, `actives/`, `PROGRESS.md` live here)
   - Optional: `docs/` inside the repo as a symlink to
-    `3b/projects/3b-harness/` (gitignored, personal-only). Decide up
+    `3b/projects/3b-forge/` (gitignored, personal-only). Decide up
     front: the existing `docs/interview-skill/` is shared/public
     analysis — it should stay committed in-repo, NOT symlinked to 3B.
     The `/init-3b` wiring needs a variant: docs stay in-repo, but the
     3B project folder still holds task tracking (`todos.md` + `actives/`).
 - [ ] **Reconcile `todos.md` locations.** Two options:
-  - (a) Move this `todos.md` into `3b/projects/3b-harness/todos.md`
+  - (a) Move this `todos.md` into `3b/projects/3b-forge/todos.md`
     (the 3B-canonical location, symlinked back OR gitignored). Keeps
     `/wrap`'s PROJECT_MODE path-reading working out of the box.
-  - (b) Keep `todos.md` at 3b-harness root (public, committed — good
+  - (b) Keep `todos.md` at 3b-forge root (public, committed — good
     for contributors to see backlog) AND also wire
-    `3b/projects/3b-harness/todos.md` for personal planning that
+    `3b/projects/3b-forge/todos.md` for personal planning that
     shouldn't be public. Dual-tracker.
   - Pick one before committing to layout.
 - [ ] **Confirm `PROJECT-CONFIG.md` fields** — minimally needs
-  `project: 3b-harness`, `domain: personal` (or `tools`?),
+  `project: 3b-forge`, `domain: personal` (or `tools`?),
   `actives_path`, `todos_path`, `type: personal` (or the new
   `plugins-workspace` type if we introduce one).
 - [ ] **Verify `/wrap` auto-detection.** After `/init-3b`, run `/wrap`
-  from `3b-harness/` and confirm it:
+  from `3b-forge/` and confirm it:
   - detects PROJECT_MODE=true,
   - reads this `todos.md` (if option a above) or the 3b-personal one
     (option b),
-  - includes 3b-harness tasks in the ACTIVE-STATUS Work table,
+  - includes 3b-forge tasks in the ACTIVE-STATUS Work table,
   - commits to both repos separately with correct scopes.
 - [ ] **Add routing entry to global CLAUDE.md** if not auto-detected —
-  `/wrap` should know `3b-harness` is a recognized project so it
+  `/wrap` should know `3b-forge` is a recognized project so it
   doesn't fall back to 3B-only mode.
 - [ ] **Decide `docs/` symlink question.** Current docs include the
   full interview-skill analysis (10 public files, ~170K); keeping
   them in-repo makes them visible to anyone browsing
-  `github.com/brandonwie/3b-harness`. Do NOT symlink `docs/` to
-  `3b/projects/3b-harness/` — that would gitignore them. Instead,
+  `github.com/brandonwie/3b-forge`. Do NOT symlink `docs/` to
+  `3b/projects/3b-forge/` — that would gitignore them. Instead,
   keep `docs/` in-repo and put ONLY personal planning
   (`todos.md`, `actives/`) under the 3B project folder.
 - [ ] **Update harness README's file-layout diagram** after 3B wiring
@@ -173,7 +173,7 @@ becomes automatic.
 
 - [ ] Add `.claude-plugin-marketplace.json` (or Claude's current
   marketplace manifest format) so
-  `claude plugin marketplace add brandonwie/3b-harness` discovers
+  `claude plugin marketplace add brandonwie/3b-forge` discovers
   individual plugins under `plugins/` correctly.
 - [ ] Document per-agent install flow for non-Claude platforms in root
   README with concrete, tested commands (current instructions are best-
@@ -200,9 +200,10 @@ Backlog — raw ideas, no roadmap slot yet. Candidates only:
 
 - [x] 2026-04-23 — `ask-socratic` repo scaffolded, v0.1.0-alpha
       committed.
-- [x] 2026-04-23 — Rename repo `ask-socratic` → `3b-harness`. Restructure
-      from single-plugin layout to harness layout with
-      `plugins/<name>/`.
+- [x] 2026-04-23 — Rename repo `ask-socratic` → `3b-harness` → `3b-forge`.
+      First rename restructured single-plugin layout to harness layout with
+      `plugins/<name>/`; second rename re-branded to 3B Forge (packaging
+      layer under the 3B umbrella — see CHANGELOG).
 - [x] 2026-04-23 — Move `plugins/interview-codex/` in from
       `ouroboros/plugins/`.
 - [x] 2026-04-23 — Copy `docs/interview-skill/` (10 analysis files,

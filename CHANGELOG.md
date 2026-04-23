@@ -13,6 +13,14 @@ per plugin.
 ### Harness-level
 
 #### Added
+- 2026-04-23 — **Repo renamed `brandonwie/3b-harness` → `brandonwie/3b-forge`.**
+  Continues the `ask-socratic` → `3b-harness` → `3b-forge` chain. Brand taxonomy
+  locked: **3B** (umbrella) / **3B Brain** (knowledge repo at `~/dev/personal/3b/`) /
+  **3B Forge** (this repo — build + packaging layer for cross-agent plugin
+  distribution) / **3B Plugin** (`plugins/3b/`, slash namespace `/3b:*`) /
+  **3B Runtime** (Python engine). GitHub repo renamed via `gh repo rename`
+  (301 redirects cover old URL). Local dir `3b-harness/` → `3b-forge/`. Claude
+  memory dir + all Brain path refs migrated. Historical entries below preserved.
 - 2026-04-23 — **SSoT consolidation** — the harness now ships a single
   plugin [`plugins/3b/`](./plugins/3b/) with two layers (conversational
   SKILL.md + agents; optional Python engine) instead of two sibling
