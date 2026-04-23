@@ -13,6 +13,93 @@ per plugin.
 ### Harness-level
 
 #### Added
+- 2026-04-24 — **Wave 2 Tier-B parameterization + drift tracking.** `installer/setup.sh`
+  rewritten to read the 3B path from `$FORGE_3B_ROOT` (required; fail-fast
+  if unset); script-relative path resolution via `${BASH_SOURCE[0]}`; `--dry-run`
+  flag; optional work-profile via `FORGE_INSTALL_WORK_PROFILE=1`; optional
+  dotfiles via `FORGE_DOTFILES_LINK`.
+- 2026-04-24 — **Drift detection tooling.** Introduced
+  [`plugins/3b/SOURCE-MANIFEST.yaml`](./plugins/3b/SOURCE-MANIFEST.yaml)
+  (18 Wave 2 entries tracking `source_path` + `source_sha` at 3B HEAD
+  `f9c6d19c`) and [`scripts/check-3b-drift.sh`](./scripts/check-3b-drift.sh)
+  (manifest-driven `git log SHA..HEAD` audit with `--verbose` mode).
+  The `claude-forge-crosschecker` agent gained a **Mode 2 — Source Drift
+  Check** that consumes the manifest and produces a structured drift
+  report.
+- 2026-04-24 — **Wave 1 leftover scrub.** Seven already-migrated hooks
+  (`knowledge-link-checker.py`, `post-implementation-review-hook.py`,
+  `regenerate-usage-dashboard.py`, `skill-routing-diff.py`,
+  `stop-verification-hook.py`, `symlink-daily-check.sh`,
+  `verify-registry.py`) and four Wave-1 content files
+  (`blog-publishing.md`, `firecrawl-usage.md`,
+  `translate-ko/SKILL.md`, `translate-ko/references/translation-guide.md`)
+  had hardcoded `~/dev/personal/3b` paths + personal refs scrubbed to
+  use `$FORGE_3B_ROOT` + the Wave 1 placeholder vocabulary.
+- 2026-04-24 — **`installer/templates/CLAUDE.md` split.** Universal
+  `CLAUDE.md` (Principles #1–#9, generic guidance, ~200 lines) + opt-in
+  `CLAUDE-3b-extension.md` (Buffer, ACTIVE-STATUS, 3B directory layout,
+  parameterized via `${FORGE_3B_ROOT}`). Users adopt the extension by
+  appending to their installed `CLAUDE.md`.
+
+#### Changed
+- `installer/README.md` — Wave 1 WIP banner removed; environment-variable
+  docs added (FORGE_3B_ROOT, FORGE_HOME, FORGE_DOTFILES_LINK,
+  FORGE_INSTALL_WORK_PROFILE, FORGE_DRY_RUN); drift-detection section
+  added pointing to `scripts/check-3b-drift.sh`.
+
+### `plugins/3b/` v0.0.2 → v0.0.3 (2026-04-24)
+
+#### Added
+- 5 Tier-B skills under `skills/`, migrated from 3B source
+  `~/dev/personal/3b/.claude/skills/` at HEAD `f9c6d19c`:
+  `check-symlinks`, `edx-study`, `blog-publish`, `research-paper`,
+  `rollup`. All paths parameterized via `${FORGE_3B_ROOT}`;
+  `check-symlinks/scripts/check-symlinks.sh` project list replaced
+  with a customizable template (previous Brandon-specific
+  moba/crucio/dayjs-util inventory stripped);
+  `blog-publish` gained `$BLOG_REPO` env var and `{blog_domain}`
+  placeholder.
+- 2 Tier-B rules: `mcp-strategy.md` (work-project names
+  `moba-*`/`backend-*` replaced with generic `myapp-*`/`myapp-api`)
+  and `local-migration.md` (`{project}` placeholder).
+- 2 Tier-B agents: `knowledge-librarian.md` and `context-reviewer.md`,
+  with `{project}` + `{project1}`/`{project2}` placeholders replacing
+  work-specific domain examples.
+- `SOURCE-MANIFEST.yaml` — public-safe drift manifest (path refs + SHAs
+  only; no 3B content).
+
+#### Changed
+- `claude-forge-crosschecker.md` — dual-mode: existing Mode 1
+  (v2-vs-v1 materials crosscheck) plus new Mode 2 (Source Drift Check
+  via SOURCE-MANIFEST.yaml + scripts/check-3b-drift.sh).
+
+### `installer/` v0.0.2 → v0.0.3 (2026-04-24)
+
+#### Added
+- 3 Tier-B hooks under `hooks/`, migrated from 3B source
+  `~/dev/personal/3b/.claude/global-claude-setup/scripts/` at HEAD
+  `f9c6d19c`: `profile-sync-hook.py`,
+  `friction-context-hook.py`, `knowledge-staleness-hook.py`. All
+  gated behind `$FORGE_3B_ROOT` with fail-open (exit 0) when the var
+  is unset, so non-3B installers don't see errors.
+- `templates/CLAUDE-3b-extension.md` — opt-in 3B methodology addon.
+
+#### Changed
+- `setup.sh` — complete rewrite (160+ lines changed). Removed the
+  "NOT READY FOR PUBLIC EXECUTION" Wave 1 banner. New flag parser,
+  path-resolution preamble, pre-flight `$FORGE_3B_ROOT` check, optional
+  dotfiles handling, opt-in work profile.
+- `templates/CLAUDE.md` — split into universal base (this file) and
+  `CLAUDE-3b-extension.md` (see above). Universal base inlines the
+  YAML frontmatter minimum and points to `plugins/3b/rules/` for full
+  schemas; no hardcoded 3B paths remain.
+- 7 Wave 1 hooks in `hooks/` (`knowledge-link-checker.py` et al.) now
+  read `$FORGE_3B_ROOT`. `symlink-daily-check.sh` drops the 3B path
+  entirely and calls `~/.claude/skills/check-symlinks/scripts/check-symlinks.sh`
+  (the installer-provided symlink chain).
+
+### Prior entries
+
 - 2026-04-24 — **Wave 1 copy-only migration from 3B `.claude/`**. Copied
   (not moved) portable Tier-A content from `~/dev/personal/3b/.claude/` into
   `3b-forge/plugins/3b/` and new `installer/` directory. No source files in
