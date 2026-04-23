@@ -13,6 +13,79 @@ per plugin.
 ### Harness-level
 
 #### Added
+- 2026-04-24 — **Wave 1 copy-only migration from 3B `.claude/`**. Copied
+  (not moved) portable Tier-A content from `~/dev/personal/3b/.claude/` into
+  `3b-forge/plugins/3b/` and new `installer/` directory. No source files in
+  3B were touched — verified by pre/post `git status` SHA match. Detailed
+  tier classification in [`tmp/migration-analysis.md`](./tmp/migration-analysis.md).
+  Locked decisions: single consolidated plugin at `plugins/3b/`; every skill
+  invokable as `/3b:{skill_name}`; 3B-bounded items inside `plugins/3b/`
+  gitignored (policy at [`plugins/3b/PUBLIC-PRIVATE-SPLIT.md`](./plugins/3b/PUBLIC-PRIVATE-SPLIT.md));
+  `installer/` is a sibling to `plugins/`, not a plugin itself and carries a
+  Wave 1 WIP banner on `setup.sh` and `templates/CLAUDE.md` because both
+  still hardcode `${HOME}/dev/personal/3b` paths (parameterization deferred
+  to Wave 2).
+
+### `plugins/3b/` v0.0.1 → v0.0.2 (2026-04-24)
+
+#### Added
+- 11 new portable skills under `skills/`, all invokable as `/3b:{name}`:
+  `clarify`, `investigate`, `review-pr`, `pr-creator`, `issue-creator`,
+  `add-pr-self-reviews`, `validate-pr-reviews`, `doc-audit`, `graphify`,
+  `translate-ko`, `task-tracker`. All scraped with coupling count ≤ 5 against
+  3B-specific path/file patterns — safe to ship as-is.
+- 13 new methodology rules under `rules/` (new directory). Covers universal
+  load (`change-discipline.md`, `pr-review-lifecycle.md`,
+  `yaml-frontmatter-schema.md`, `tag-taxonomy.md`) and path-gated load
+  (`knowledge-creation.md`, `tmp-files.md`, `reference-credibility.md`,
+  `runtime-environment.md`, `firecrawl-usage.md`,
+  `claude-settings-lookup.md`, `task-starter-post-plan.md`,
+  `blog-publishing.md`, `dotfiles-management.md`).
+- 1 new agent: `claude-forge-crosschecker.md` — renamed on copy from the
+  original `forge-crosschecker.md`. New name carries the lineage of the
+  `claude-forge` sibling project (short-lived effort focused on global Claude
+  Code settings + plugin management, folded into 3b-forge April 2026).
+- `PUBLIC-PRIVATE-SPLIT.md` — maintainer policy doc describing the gitignore
+  rubric that separates public Tier-A content from locally-staged 3B-bounded
+  items.
+
+#### Changed
+- `plugin.json` — version bump, description expanded to enumerate the new
+  skills, keywords extended (`skills`, `rules`, `methodology`,
+  `yaml-frontmatter`, `pr-review`, `zettelkasten`), explicit `agents` and
+  `commands` paths registered.
+- `README.md` — rewritten Current skills table, added Methodology rules and
+  Agents tables, updated File layout and Graduation criterion to reflect
+  Wave 1 state.
+
+### `installer/` (new directory, 2026-04-24)
+
+Sibling to `plugins/` at repo root. Not a Claude Code plugin — this is the
+shell-installer payload (eventually the `curl … | sh` target for external
+users). Wave 1 status: **reference only, do not execute**.
+
+#### Added
+- `setup.sh` (WIP banner: hardcoded 3B path; Wave 2 will parameterize).
+- `statusline-wrapper.sh` — portable statusline helper.
+- `templates/` — starter `CLAUDE.md` (WIP banner, 3B-referenced),
+  `settings.example.json` (clean, uses `$HOME`), `AGENTS.md` and `GEMINI.md`
+  symlinks, example plugin manifests.
+- `claude-hud-patches/` — claude-hud overlay patches.
+- `commands/commit.md`, `commands/clean-review/` — portable slash commands.
+- `hooks/` — 21 portable hook scripts (AWS / Terraform safety, TS check,
+  formatter, stop-verification, symlink check, skill/plugin/MCP usage
+  tracking, …).
+- `README.md` — public-facing inventory + Wave 1 WIP status banner.
+
+#### Not copied (stays private)
+- `settings.json` (maintainer's personal paths).
+- `task-tracker.json` (personal data).
+- `settings.local.work.json` (work-repo permissions).
+- `init-3b.md` command (bootstraps 3B itself, tightly bound).
+- 3B-coupled hooks: `profile-sync-hook.py`, `friction-context-hook.py`,
+  `knowledge-staleness-hook.py`. Deferred to Wave 2 after parameterization.
+
+### Harness-level (continued)
 - 2026-04-23 — **Repo renamed `brandonwie/3b-harness` → `brandonwie/3b-forge`.**
   Continues the `ask-socratic` → `3b-harness` → `3b-forge` chain. Brand taxonomy
   locked: **3B** (umbrella) / **3B Brain** (knowledge repo at `~/dev/personal/3b/`) /

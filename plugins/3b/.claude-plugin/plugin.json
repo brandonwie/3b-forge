@@ -1,7 +1,7 @@
 {
   "name": "3b",
-  "version": "0.0.1",
-  "description": "3b-forge single source of truth. Currently ships the `/3b:interview` Socratic skill. Cross-agent: Claude Code, Codex, Gemini CLI, and any future agent host that can read markdown skills. Optional Python engine at `engine/` for programmatic integrators (numeric ambiguity scoring, state persistence).",
+  "version": "0.0.2",
+  "description": "3b-forge single source of truth. Ships /3b:interview (Socratic interview engine with 7 role agents + optional Python core) plus 11 additional portable skills (clarify, investigate, review-pr, pr-creator, issue-creator, add-pr-self-reviews, validate-pr-reviews, doc-audit, graphify, translate-ko, task-tracker), 1 agent (claude-forge-crosschecker), and 13 methodology rules under rules/. Cross-agent: Claude Code, Codex, Gemini CLI.",
   "author": {
     "name": "Brandon Wie",
     "email": "brandonwie.cs@gmail.com"
@@ -11,7 +11,7 @@
   "license": "MIT",
   "keywords": [
     "3b",
-    "harness",
+    "forge",
     "interview",
     "socratic",
     "requirements",
@@ -21,7 +21,15 @@
     "codex",
     "gemini",
     "ssot",
-    "pre-release"
+    "pre-release",
+    "skills",
+    "rules",
+    "methodology",
+    "yaml-frontmatter",
+    "pr-review",
+    "zettelkasten"
   ],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "commands": "./commands/"
 }
