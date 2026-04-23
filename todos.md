@@ -13,69 +13,23 @@ Issues) because this is a personal workspace.
 Status markers: `[ ]` open, `[~]` in-progress, `[x]` done, `[-]` skipped,
 `[!]` blocker.
 
-## Current focus — cross-variant comparison
+## Adjudication — resolved 2026-04-23
 
-Goal: diff the two interview plugin snapshots
-(`plugins/interview-claude/` v0.0.1 and `plugins/interview-codex/`
-v0.1.0) side by side, decide the path forward, then unblock the
-release roadmap.
+Cross-variant review cycle (CA1 + CA3) closed. Direction chosen:
+**merge best-of-both into single [`plugins/3b/`](./plugins/3b/)** with
+two **layers** (conversational SKILL + optional Python `engine/`).
 
-### Adjudication (2026-04-23, revised same day)
+- [x] **CA1** — cross-analyzed both snapshots across 8 design axes.
+- [x] **CA3** — direction decided; consolidation shipped.
+- [-] **CA2** — standalone variant-comparison doc dropped; the
+      two-layer rationale now lives in `plugins/3b/README.md` + root
+      `README.md` "Why ONE plugin with two layers" section.
+- [-] **CA3 formal ADR** — dropped; decision captured in CHANGELOG +
+      plugin README. No separate ADR needed.
 
-CA1 + CA3 resolved via self-review cross-analysis plus a user-driven
-course correction:
-
-- [`review-from-claude.md`](./review-from-claude.md) — Claude's review of
-  `interview-claude` against `interview-codex` baseline.
-- [`review-from-codex.md`](./review-from-codex.md) — Codex's review of
-  `interview-codex` against `interview-claude` baseline.
-- [`consolidated-plan.md`](./consolidated-plan.md) — reconciles both
-  reviews; see its **⚠️ REVISION** banner at top for the corrected
-  direction.
-
-**Direction chosen: CA3 option (a) — Merge best-of-both.** One plugin,
-[`plugins/3b/`](./plugins/3b/), with TWO **layers** (not two plugins):
-
-- **Conversational layer** — SKILL.md playbook + 7 agent prompts.
-  Zero runtime deps. Slash command `/3b:interview`. Works on Claude
-  Code, Codex, Gemini CLI, any future AI agent that can read markdown.
-- **Programmatic layer** — [`plugins/3b/engine/`](./plugins/3b/engine/)
-  Python package (`interview_plugin_core`). Numeric ambiguity scoring,
-  file-locked state persistence, 60+ async tests. Optional — loads
-  prompts from the same `plugins/3b/agents/` as the conversational
-  layer (SSoT).
-
-Old snapshots moved to [`archive/plugins/`](./archive/) with
-explanatory READMEs. The first-pass adjudication (keep both as
-siblings) is recorded in consolidated-plan.md's REVISION section.
-
-- [x] **CA1 — Cross-analyze both snapshots.** Done via `review-from-claude.md`
-  + `review-from-codex.md`. All 8 design axes covered. See also
-  `consolidated-plan.md` §1 structural comparison matrix.
-
-- [ ] **CA2 — Write `docs/interview-skill/10-variant-comparison.md`**
-  (EN). **Scope revised** — doc now describes the two-**layer**
-  architecture of `plugins/3b/` rather than two sibling plugins.
-  Contents:
-  - [ ] Why the plugin has a conversational layer AND a programmatic
-        layer (prompt-heavy vs engine-heavy as two surfaces of one
-        plugin, not two plugins).
-  - [ ] When to use which layer; how they share `agents/` via SSoT.
-  - [ ] Reference to the archived original variants as design-journey
-        context.
-  - [ ] Mirror doc in Korean:
-        `docs/interview-skill/10-variant-comparison.ko.md`
-  - [ ] Update `docs/interview-skill/README.md` index to list doc 10
-
-- [x] **CA3 — Decide direction.** Chose **(a) Merge best-of-both**
-  into single `plugins/3b/` with archived originals under
-  `archive/plugins/`. See Adjudication block above.
-  - [ ] Document decision in
-        `docs/interview-skill/11-direction-decision.md` (formal ADR
-        still TODO — `consolidated-plan.md` REVISION is the current
-        record but a dedicated ADR keeps the decision trail cleaner).
-  - [ ] Update root README (Phase 6 — to reflect single-plugin
-        workspace + archive layout).
+Internal adjudication artifacts (cross-reviews, consolidated plan)
+and upstream-Ouroboros analysis moved to `tmp/` (gitignored) as
+internal design-journey material.
 
 ## Post-comparison roadmap (blocked on CA3)
 
@@ -89,7 +43,7 @@ and will not continue.
   per-agent install instructions with tested commands, release notes
   in CHANGELOG.
 - [ ] **v0.2.0** — Path A (MCP) via `interview-ai` PyPI package.
-  See `docs/interview-skill/09-plugin-build-decisions.md` Phase 2.
+  (See internal build-decisions doc under `tmp/interview-skill/` Phase 2.)
   - [ ] Port core utilities (types, errors, file_lock, security,
         initial_context, seed dataclass)
   - [ ] Port providers (LLMAdapter + litellm impl)
@@ -132,8 +86,9 @@ becomes automatic.
     `todos.md`, `actives/`, `PROGRESS.md` live here)
   - Optional: `docs/` inside the repo as a symlink to
     `3b/projects/3b-forge/` (gitignored, personal-only). Decide up
-    front: the existing `docs/interview-skill/` is shared/public
-    analysis — it should stay committed in-repo, NOT symlinked to 3B.
+    front: no `docs/` directory currently — prior Ouroboros analysis
+    was moved to `tmp/` as internal material. If future public docs
+    emerge, they go under `docs/` in-repo (NOT symlinked to 3B).
     The `/init-3b` wiring needs a variant: docs stay in-repo, but the
     3B project folder still holds task tracking (`todos.md` + `actives/`).
 - [ ] **Reconcile `todos.md` locations.** Two options:
@@ -159,13 +114,11 @@ becomes automatic.
 - [ ] **Add routing entry to global CLAUDE.md** if not auto-detected —
   `/wrap` should know `3b-forge` is a recognized project so it
   doesn't fall back to 3B-only mode.
-- [ ] **Decide `docs/` symlink question.** Current docs include the
-  full interview-skill analysis (10 public files, ~170K); keeping
-  them in-repo makes them visible to anyone browsing
-  `github.com/brandonwie/3b-forge`. Do NOT symlink `docs/` to
-  `3b/projects/3b-forge/` — that would gitignore them. Instead,
-  keep `docs/` in-repo and put ONLY personal planning
-  (`todos.md`, `actives/`) under the 3B project folder.
+- [x] **Decide `docs/` symlink question.** Resolved 2026-04-23 —
+  `docs/interview-skill/` was internal analysis, moved to `tmp/`
+  (gitignored). No public `docs/` dir exists currently. Future public
+  docs, if any, stay in-repo. Personal planning (`todos.md`,
+  `actives/`) goes under 3B project folder when `/init-3b` runs.
 - [ ] **Update harness README's file-layout diagram** after 3B wiring
   to document which files are in-repo vs in 3B.
 
@@ -214,13 +167,9 @@ Backlog — raw ideas, no roadmap slot yet. Candidates only:
 
 ## References
 
-- Root [README.md](./README.md) — harness overview.
+- Root [README.md](./README.md) — forge overview.
 - [CHANGELOG.md](./CHANGELOG.md) — history of changes.
-- Key design doc:
-  [docs/interview-skill/09-plugin-build-decisions.md](./docs/interview-skill/09-plugin-build-decisions.md)
-  (EN) /
-  [docs/interview-skill/09-plugin-build-decisions.ko.md](./docs/interview-skill/09-plugin-build-decisions.ko.md)
-  (KO).
-- Analysis index:
-  [docs/interview-skill/README.md](./docs/interview-skill/README.md).
+- Internal design-journey material (gitignored): `tmp/interview-skill/`,
+  `tmp/archive/`, `tmp/review-from-claude.md`, `tmp/review-from-codex.md`,
+  `tmp/consolidated-plan.md`.
 - Upstream: [Q00/ouroboros](https://github.com/Q00/ouroboros).
