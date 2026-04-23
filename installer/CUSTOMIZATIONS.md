@@ -485,10 +485,10 @@ Claude Code does not pass `CLAUDE_CONFIG_DIR` to statusline subprocesses. Each
 profile's `settings.json` must **embed** the config dir in the command (verified
 working 2026-02-04):
 
-| Profile  | `statusLine.command`                                                                               |
-| -------- | -------------------------------------------------------------------------------------------------- |
-| Personal | `/Users/brandonwie/.claude/statusline-wrapper.sh` (defaults to `~/.claude`)                        |
-| Work     | `CLAUDE_CONFIG_DIR=/Users/brandonwie/.claude-work /Users/brandonwie/.claude/statusline-wrapper.sh` |
+| Profile  | `statusLine.command`                                                           |
+| -------- | ------------------------------------------------------------------------------ |
+| Personal | `~/.claude/statusline-wrapper.sh` (defaults to `~/.claude`)                    |
+| Work     | `CLAUDE_CONFIG_DIR=~/.claude-work ~/.claude/statusline-wrapper.sh`             |
 
 **Why:** The wrapper reads `CLAUDE_CONFIG_DIR` to determine which keychain entry
 and cache to use. Without the explicit env var in the command, the wrapper
@@ -921,7 +921,7 @@ These directories are no longer needed and can be removed:
 | 2026-03-02 | Output style documentation and per-project guidance                | v1.1 Phase 5: document available styles, add project-specific recommendations                                                                             |
 | 2026-02-04 | Embed `CLAUDE_CONFIG_DIR` in work statusline command (verified)    | Claude Code does not pass env vars to statusline subprocess; wrapper always defaulted to personal profile                                                 |
 | 2026-02-04 | Remove `_claude_sync_token` from `.zshrc`                          | Sync copied base keychain (personal) to work entry, overwriting correct work token. Claude Code manages profile entries natively.                         |
-| 2026-02-04 | Clean up duplicate keychain entries                                | `_claude_sync_token` created entries with `acct: "Claude Code"` alongside native `acct: "brandonwie"` entries, causing unpredictable reads                |
+| 2026-02-04 | Clean up duplicate keychain entries                                | `_claude_sync_token` created entries with `acct: "Claude Code"` alongside native `acct: "$USER"` entries, causing unpredictable reads                     |
 | 2026-02-04 | Patch script now patches both profiles                             | Work HUD was unpatched — script only targeted `~/.claude`                                                                                                 |
 | 2026-02-04 | Fix patch detection false-positives                                | Patches 3/4 checked file-wide for `CLAUDE_HUD_CONFIG_DIR`, matched patch 2's homeDir change instead of function-specific usage                            |
 | 2026-02-04 | Remove stale `.claude.json.backup`                                 | Backup had `installMethod: "global"`, causing native install mismatch warning                                                                             |

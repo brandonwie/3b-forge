@@ -114,5 +114,5 @@ if [[ -n "$HUD_PATH" ]]; then
 		CLAUDE_HUD_PLAN_LABEL="$PLAN_LABEL" \
 		CLAUDE_HUD_ENV_LABEL="$ENV_LABEL" \
 		CLAUDE_HUD_ENV_VERSION="$ENV_VERSION" \
-		/Users/brandonwie/.asdf/shims/bun "${HUD_PATH}src/index.ts"
+		"${BUN_BIN:-$(command -v bun)}" "${HUD_PATH}src/index.ts"
 fi

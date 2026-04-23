@@ -25,7 +25,9 @@ levels. It does NOT auto-fix — the user decides what to act on.
 ### 3. Type Safety
 
 - No `any` type without explicit justification comment
-- No unsafe type assertions (`as Type`, `!` non-null assertion) without guard
+- No unsafe type assertions without a runtime guard (language-specific —
+  e.g., TS: `as Type`, `!` non-null; Rust: `unwrap()`; Python: silent
+  `cast()`). If an assertion is unavoidable, pair it with a guard.
 - Generic constraints are tight enough to prevent misuse
 - Function return types match all code paths
 

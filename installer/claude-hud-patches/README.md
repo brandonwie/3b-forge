@@ -93,10 +93,10 @@ statusline command:
 
 ```json
 // Personal (~/.claude/settings.json) — defaults to ~/.claude, no override needed
-"command": "/Users/brandonwie/.claude/statusline-wrapper.sh"
+"command": "~/.claude/statusline-wrapper.sh"
 
 // Work (~/.claude-work/settings.json) — must explicitly set CLAUDE_CONFIG_DIR
-"command": "CLAUDE_CONFIG_DIR=/Users/brandonwie/.claude-work /Users/brandonwie/.claude/statusline-wrapper.sh"
+"command": "CLAUDE_CONFIG_DIR=~/.claude-work ~/.claude/statusline-wrapper.sh"
 ```
 
 The wrapper then derives all HUD settings from `CLAUDE_CONFIG_DIR`:
@@ -534,7 +534,7 @@ cat ~/.claude-work/plugins/claude-hud/.usage-cache.json 2>/dev/null | python3 -m
 | 2026-03-03 | Remove broken Patch 5 (`session-line.ts` 7d threshold)          | Replaced by Group D template with configurable `sevenDayThreshold` from config                                 |
 | 2026-02-04 | Embed `CLAUDE_CONFIG_DIR` in work statusline command (verified) | Claude Code does not pass env vars to statusline subprocesses; wrapper defaulted to personal                   |
 | 2026-02-04 | Remove `_claude_sync_token` from `.zshrc`                       | Sync overwrote work keychain with personal token; Claude manages entries natively                              |
-| 2026-02-04 | Clean up duplicate keychain entries                             | Sync created `acct: "Claude Code"` duplicates alongside native `acct: "brandonwie"` entries                    |
+| 2026-02-04 | Clean up duplicate keychain entries                             | Sync created `acct: "Claude Code"` duplicates alongside native `acct: "$USER"` entries                         |
 | 2026-02-04 | Patch script now targets both `~/.claude` and `~/.claude-work`  | Script only patched personal profile; work HUD ran unpatched                                                   |
 | 2026-02-04 | Fix patch 3/4 detection (function-scoped grep)                  | File-wide grep for `CLAUDE_HUD_CONFIG_DIR` matched patch 2's homeDir, causing false-positive "Already patched" |
 | 2026-01-27 | Token expiration check in wrapper                               | HUD showed no data when token expired                                                                          |

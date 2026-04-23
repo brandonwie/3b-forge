@@ -327,10 +327,10 @@ Lifecycle rules in `3b/.claude/rules/change-discipline.md` § Friction Lifecycle
 Policies for installed external tools available across all projects:
 
 - **Firecrawl** (web scraping/search/interact, free tier 1,175 credits) — see
-  `/Users/brandonwie/dev/personal/3b/.claude/rules/firecrawl-usage.md` for
-  decision matrix (WebFetch vs firecrawl-\* vs playwright vs chrome-devtools)
-  and credit discipline. Default to free tools first; explicit user confirmation
-  required before `firecrawl-crawl` or `firecrawl-download`.
+  `~/dev/personal/3b/.claude/rules/firecrawl-usage.md` for decision matrix
+  (WebFetch vs firecrawl-\* vs playwright vs chrome-devtools) and credit
+  discipline. Default to free tools first; explicit user confirmation required
+  before `firecrawl-crawl` or `firecrawl-download`.
 
 ---
 
