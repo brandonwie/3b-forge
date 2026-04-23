@@ -76,44 +76,31 @@ scope which changes go where and can't auto-populate the ACTIVE-STATUS
 "Work" table with 3b-forge tasks. With proper 3B wiring, all of that
 becomes automatic.
 
-- [ ] **Run `/init-3b` inside 3b-forge** to wire it into the 3B
-  knowledge system. This creates:
-  - `3b/.claude/project-claude/3b-forge.md` (project CLAUDE.md
-    source; the repo's `CLAUDE.md` becomes a symlink to this)
-  - `3b/.claude/prompts/3b-forge/PROJECT-CONFIG.md` (tells skills
-    where to find todos, PROGRESS, actives, docs paths)
-  - `3b/projects/3b-forge/` (personal docs + task tracking —
-    `todos.md`, `actives/`, `PROGRESS.md` live here)
-  - Optional: `docs/` inside the repo as a symlink to
-    `3b/projects/3b-forge/` (gitignored, personal-only). Decide up
-    front: no `docs/` directory currently — prior Ouroboros analysis
-    was moved to `tmp/` as internal material. If future public docs
-    emerge, they go under `docs/` in-repo (NOT symlinked to 3B).
-    The `/init-3b` wiring needs a variant: docs stay in-repo, but the
-    3B project folder still holds task tracking (`todos.md` + `actives/`).
-- [ ] **Reconcile `todos.md` locations.** Two options:
-  - (a) Move this `todos.md` into `3b/projects/3b-forge/todos.md`
-    (the 3B-canonical location, symlinked back OR gitignored). Keeps
-    `/wrap`'s PROJECT_MODE path-reading working out of the box.
-  - (b) Keep `todos.md` at 3b-forge root (public, committed — good
-    for contributors to see backlog) AND also wire
-    `3b/projects/3b-forge/todos.md` for personal planning that
-    shouldn't be public. Dual-tracker.
-  - Pick one before committing to layout.
-- [ ] **Confirm `PROJECT-CONFIG.md` fields** — minimally needs
-  `project: 3b-forge`, `domain: personal` (or `tools`?),
-  `actives_path`, `todos_path`, `type: personal` (or the new
-  `plugins-workspace` type if we introduce one).
-- [ ] **Verify `/wrap` auto-detection.** After `/init-3b`, run `/wrap`
-  from `3b-forge/` and confirm it:
-  - detects PROJECT_MODE=true,
-  - reads this `todos.md` (if option a above) or the 3b-personal one
-    (option b),
-  - includes 3b-forge tasks in the ACTIVE-STATUS Work table,
-  - commits to both repos separately with correct scopes.
-- [ ] **Add routing entry to global CLAUDE.md** if not auto-detected —
-  `/wrap` should know `3b-forge` is a recognized project so it
-  doesn't fall back to 3B-only mode.
+- [x] 2026-04-23 — **Ran `/init-3b` inside 3b-forge** (scaffold D,
+  simple). Created:
+  - `3b/.claude/project-claude/3b-forge.md` (CLAUDE.md SoT; repo
+    `CLAUDE.md` symlinked)
+  - `3b/.claude/prompts/3b-forge/PROJECT-CONFIG.md` (personal template)
+  - `3b/projects/3b-forge/` (empty; task tracking will land here —
+    separate from Brain's existing `projects/3b/`)
+  - `docs/` symlink → `3b/projects/3b-forge/` (gitignored,
+    personal-only). Public docs, if any, stay in-repo.
+  - Registered in `3b/.claude/projects.md` (Registered + Sync Status).
+- [~] **Reconcile `todos.md` locations.** De-facto option (b) in place:
+  `todos.md` stays at repo root (public backlog), `3b/projects/3b-forge/`
+  stands ready for personal planning. Revisit once 3B-side gains
+  content and /wrap path-reading needs a canonical home.
+- [x] 2026-04-23 — **Confirmed `PROJECT-CONFIG.md` fields** (personal
+  template: `name`, `type: personal`, GitHub org/repo, `todos: todos.md`,
+  `progress: PROGRESS.md`, status symbols). `actives_path` intentionally
+  omitted for now — no actives folder pattern in use.
+- [~] **Verify `/wrap` auto-detection.** This /wrap run is the test
+  (running post `/init-3b` from `3b-forge/`). Confirms PROJECT_MODE=true
+  and dual-repo commits. ACTIVE-STATUS Work-table inclusion depends on
+  an actives folder layout, which is not set up (see reconcile task
+  above).
+- [ ] **Add routing entry to global CLAUDE.md** only if needed —
+  PROJECT-CONFIG.md auto-detection handled it this run.
 - [x] **Decide `docs/` symlink question.** Resolved 2026-04-23 —
   `docs/interview-skill/` was internal analysis, moved to `tmp/`
   (gitignored). No public `docs/` dir exists currently. Future public

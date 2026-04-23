@@ -44,3 +44,6 @@ AGENTS.md
 
 # Claude Code per-user settings
 .claude/settings.local.json
+
+# 3B symlink (personal content, gitignored)
+docs
