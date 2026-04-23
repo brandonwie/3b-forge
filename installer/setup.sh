@@ -1,88 +1,114 @@
 #!/bin/bash
 # =============================================================================
-# Global ~/.claude Setup Script
+# 3b-forge Installer — Global ~/.claude Setup Script
 # =============================================================================
 #
-# ⚠️ WAVE 1 STATUS — NOT READY FOR PUBLIC EXECUTION.
-# This script still hardcodes `${HOME}/dev/personal/3b` as the source tree.
-# Wave 2 will parameterize the path so external installs work.
-# Until then: read this script as reference only; do not run.
+# Wires ~/.claude (and optionally ~/.claude-work) to a user-provided 3B-style
+# knowledge repository. The source repo must follow the 3B layout:
 #
-# =============================================================================
-# This script sets up the global Claude Code configuration from 3B.
-# It is idempotent - safe to run multiple times.
+#   $FORGE_3B_ROOT/.claude/global-claude-setup/
+#     ├── commands/
+#     ├── hooks/
+#     ├── scripts/
+#     ├── templates/CLAUDE.md
+#     └── ... (full list in installer/README.md)
 #
-# What it does:
-#   Personal profile (~/.claude → 3B):
-#     1. Initializes dotfiles submodule and creates symlink
-#     2. Creates ~/.claude directories
-#     3. Symlinks settings.json from 3B
-#     4. Symlinks commands/ from 3B
-#     5. Symlinks CLAUDE.md from 3B
-#     6. Symlinks CUSTOMIZATIONS.md from 3B
-#     7. Symlinks statusline-wrapper.sh from 3B
-#     8. Symlinks claude-hud-patches/ from 3B
-#     9. Symlinks plugins/claude-hud/config.json from 3B
-#    10. Symlinks task-tracker.json from 3B
-#    11. Symlinks scripts/ from 3B (hook scripts)
-#    12. Symlinks hooks/ from 3B
-#    13. Symlinks friction-log files from 3B
-#    14. Symlinks skills/ from 3B
-#    15. Symlinks RTK.md from 3B
+# Opt-in helper for users who have adopted the 3B methodology. Users without a
+# 3B-style repo can copy installer/templates/* into ~/.claude/ manually.
 #
-#   Work profile (~/.claude-work → ~/.claude chain):
-#    16. Creates ~/.claude-work directories
-#    17. Chains shared config through ~/.claude
-#    18. Symlinks settings.local.json → work override in 3B
+# Required env var:
+#   FORGE_3B_ROOT                 Path to your 3B repo (no default; fail-fast).
 #
-# Prerequisites:
-#   - 3B repository cloned to ~/dev/personal/3b
+# Optional env vars:
+#   FORGE_HOME                    Forge repo root. Default: script's parent dir.
+#   FORGE_DOTFILES_LINK           Path for dotfiles symlink.
+#                                 Default: $HOME/dev/personal/dotfiles.
+#                                 Skipped if $FORGE_3B_ROOT/dotfiles absent.
+#   FORGE_INSTALL_WORK_PROFILE=1  Enable work profile (~/.claude-work).
+#                                 Default: off.
+#   FORGE_DRY_RUN=1               Print what would run; make no changes.
+#                                 (Or pass --dry-run on the command line.)
 #
 # Usage:
+#   export FORGE_3B_ROOT=/path/to/your/3b
 #   ./setup.sh
 #
+#   # With overrides:
+#   FORGE_3B_ROOT=/custom/path FORGE_INSTALL_WORK_PROFILE=1 ./setup.sh --dry-run
+#
+# Idempotent — safe to run multiple times.
 # =============================================================================
 
-set -e # Exit on error
+set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# --- Flag parsing -----------------------------------------------------------
+DRY_RUN="${FORGE_DRY_RUN:-0}"
+for arg in "$@"; do
+	case "$arg" in
+	--dry-run) DRY_RUN=1 ;;
+	-h | --help)
+		sed -n '2,44p' "$0"
+		exit 0
+		;;
+	*)
+		echo "Unknown flag: $arg" >&2
+		echo "See --help for usage." >&2
+		exit 2
+		;;
+	esac
+done
 
-# Configuration
-THREE_B="${HOME}/dev/personal/3b"
+# --- Path resolution --------------------------------------------------------
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FORGE_HOME="${FORGE_HOME:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
+
+if [ -z "${FORGE_3B_ROOT:-}" ]; then
+	echo "ERROR: FORGE_3B_ROOT must be set before running this installer." >&2
+	echo "  Example: export FORGE_3B_ROOT=/path/to/your/3b" >&2
+	echo "  See installer/README.md for full setup instructions." >&2
+	exit 1
+fi
+
+THREE_B="${FORGE_3B_ROOT}"
 GLOBAL_SETUP="${THREE_B}/.claude/global-claude-setup"
 CLAUDE_DIR="${HOME}/.claude"
 CLAUDE_WORK_DIR="${HOME}/.claude-work"
 
-# Helper functions
-info() {
-	echo -e "${BLUE}[INFO]${NC} $1"
-}
+DOTFILES_LINK="${FORGE_DOTFILES_LINK:-${HOME}/dev/personal/dotfiles}"
+DOTFILES_TARGET="${THREE_B}/dotfiles"
 
-success() {
-	echo -e "${GREEN}[✓]${NC} $1"
-}
+INSTALL_WORK_PROFILE="${FORGE_INSTALL_WORK_PROFILE:-0}"
 
-warning() {
-	echo -e "${YELLOW}[!]${NC} $1"
-}
+# --- Colors -----------------------------------------------------------------
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
 
+# --- Helpers ----------------------------------------------------------------
+info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+success() { echo -e "${GREEN}[✓]${NC} $1"; }
+warning() { echo -e "${YELLOW}[!]${NC} $1"; }
 error() {
 	echo -e "${RED}[✗]${NC} $1"
 	exit 1
 }
+dry_msg() {
+	[ "$DRY_RUN" = "1" ] && echo -e "${YELLOW}[DRY]${NC} $1"
+}
 
-# Create symlink helper (handles existing files/symlinks)
+# create_symlink: honors DRY_RUN
 create_symlink() {
 	local source="$1"
 	local target="$2"
 	local name="$3"
 
-	# Remove existing symlink or backup existing file/directory
+	if [ "$DRY_RUN" = "1" ]; then
+		dry_msg "symlink $name: $source -> $target"
+		return
+	fi
+
 	if [ -L "$target" ]; then
 		rm "$target"
 	elif [ -e "$target" ]; then
@@ -94,69 +120,76 @@ create_symlink() {
 	success "$name symlinked"
 }
 
-# Check prerequisites
+# --- Prerequisites ----------------------------------------------------------
 check_prerequisites() {
-	if [ ! -d "$THREE_B" ]; then
-		error "3B repository not found at $THREE_B"
+	[ -d "$THREE_B" ] || error "3B repository not found at $THREE_B (\$FORGE_3B_ROOT)"
+	[ -d "$GLOBAL_SETUP" ] || error "Global setup directory not found at $GLOBAL_SETUP"
+	success "Prerequisites verified (FORGE_3B_ROOT=$THREE_B)"
+	if [ "$DRY_RUN" = "1" ]; then
+		warning "DRY RUN — no filesystem changes will be made"
 	fi
-
-	if [ ! -d "$GLOBAL_SETUP" ]; then
-		error "Global setup directory not found at $GLOBAL_SETUP"
-	fi
-
-	success "Prerequisites verified"
 }
 
-# Setup dotfiles submodule
+# --- Dotfiles (optional) ----------------------------------------------------
 setup_dotfiles_submodule() {
+	if [ ! -d "$DOTFILES_TARGET" ]; then
+		info "Dotfiles: skipping (${DOTFILES_TARGET} not present in 3B)"
+		return
+	fi
+
 	info "Checking dotfiles submodule..."
 
-	# Initialize submodule if not already done
-	if [ ! -f "${THREE_B}/dotfiles/bootstrap.sh" ]; then
+	if [ ! -f "${DOTFILES_TARGET}/bootstrap.sh" ]; then
 		info "Initializing dotfiles submodule..."
-		git -C "${THREE_B}" submodule update --init --recursive
+		if [ "$DRY_RUN" = "1" ]; then
+			dry_msg "git -C ${THREE_B} submodule update --init --recursive"
+		else
+			git -C "${THREE_B}" submodule update --init --recursive
+		fi
 		success "Dotfiles submodule initialized"
 	else
 		success "Dotfiles submodule already initialized"
 	fi
 
-	# Create symlink at ~/dev/personal/dotfiles
-	local DOTFILES_LINK="${HOME}/dev/personal/dotfiles"
-	local DOTFILES_TARGET="${THREE_B}/dotfiles"
-
 	if [ -L "$DOTFILES_LINK" ]; then
-		success "Dotfiles symlink already exists"
+		success "Dotfiles symlink already exists at $DOTFILES_LINK"
 	elif [ -d "$DOTFILES_LINK" ]; then
-		warning "~/dev/personal/dotfiles exists as directory"
-		warning "MANUAL ACTION REQUIRED:"
-		warning "  rm -rf ~/dev/personal/dotfiles"
+		warning "$DOTFILES_LINK exists as directory — MANUAL ACTION REQUIRED:"
+		warning "  rm -rf $DOTFILES_LINK"
 		warning "  ln -s ${DOTFILES_TARGET} ${DOTFILES_LINK}"
 	else
-		mkdir -p "${HOME}/dev/personal"
-		ln -s "$DOTFILES_TARGET" "$DOTFILES_LINK"
-		success "Created dotfiles symlink"
+		if [ "$DRY_RUN" = "1" ]; then
+			dry_msg "mkdir -p $(dirname "$DOTFILES_LINK") && ln -s $DOTFILES_TARGET $DOTFILES_LINK"
+		else
+			mkdir -p "$(dirname "$DOTFILES_LINK")"
+			ln -s "$DOTFILES_TARGET" "$DOTFILES_LINK"
+		fi
+		success "Created dotfiles symlink at $DOTFILES_LINK"
 	fi
 }
 
-# Step 1: Create ~/.claude directories
+# --- Setup steps ------------------------------------------------------------
 create_directories() {
 	info "Creating ~/.claude directories..."
-
-	mkdir -p "${CLAUDE_DIR}/plugins/claude-hud"
-
+	if [ "$DRY_RUN" = "1" ]; then
+		dry_msg "mkdir -p ${CLAUDE_DIR}/plugins/claude-hud"
+	else
+		mkdir -p "${CLAUDE_DIR}/plugins/claude-hud"
+	fi
 	success "Directories created"
 }
 
-# Step 2: Setup settings.json
 setup_settings() {
 	info "Setting up settings.json..."
 
-	# Check if settings.json exists in 3B (the real one, gitignored)
 	if [ -f "${GLOBAL_SETUP}/settings.json" ]; then
 		create_symlink "${GLOBAL_SETUP}/settings.json" "${CLAUDE_DIR}/settings.json" "settings.json"
 	elif [ ! -f "${CLAUDE_DIR}/settings.json" ]; then
-		# No real settings.json in 3B yet, copy template
-		cp "${GLOBAL_SETUP}/templates/settings.example.json" "${CLAUDE_DIR}/settings.json"
+		if [ "$DRY_RUN" = "1" ]; then
+			dry_msg "cp ${GLOBAL_SETUP}/templates/settings.example.json ${CLAUDE_DIR}/settings.json"
+		else
+			cp "${GLOBAL_SETUP}/templates/settings.example.json" "${CLAUDE_DIR}/settings.json"
+		fi
 		warning "Created settings.json from template (not symlinked)"
 		warning "MANUAL ACTION REQUIRED: Edit ~/.claude/settings.json"
 		warning "  - Replace YOUR_GITHUB_TOKEN_HERE with your actual GitHub token"
@@ -167,61 +200,51 @@ setup_settings() {
 	fi
 }
 
-# Step 3: Symlink commands directory
 setup_commands() {
 	info "Setting up commands symlink..."
 	create_symlink "${GLOBAL_SETUP}/commands" "${CLAUDE_DIR}/commands" "commands/"
 }
 
-# Step 4: Symlink CLAUDE.md
 setup_claude_md() {
 	info "Setting up CLAUDE.md symlink..."
 	create_symlink "${GLOBAL_SETUP}/templates/CLAUDE.md" "${CLAUDE_DIR}/CLAUDE.md" "CLAUDE.md"
 }
 
-# Step 5: Symlink CUSTOMIZATIONS.md
 setup_customizations() {
 	info "Setting up CUSTOMIZATIONS.md symlink..."
 	create_symlink "${GLOBAL_SETUP}/CUSTOMIZATIONS.md" "${CLAUDE_DIR}/CUSTOMIZATIONS.md" "CUSTOMIZATIONS.md"
 }
 
-# Step 6: Symlink statusline-wrapper.sh
 setup_statusline() {
 	info "Setting up statusline-wrapper.sh symlink..."
 	create_symlink "${GLOBAL_SETUP}/statusline-wrapper.sh" "${CLAUDE_DIR}/statusline-wrapper.sh" "statusline-wrapper.sh"
 }
 
-# Step 7: Symlink claude-hud-patches/
 setup_hud_patches() {
 	info "Setting up claude-hud-patches symlink..."
 	create_symlink "${GLOBAL_SETUP}/claude-hud-patches" "${CLAUDE_DIR}/claude-hud-patches" "claude-hud-patches/"
 }
 
-# Step 8: Symlink plugins/claude-hud/config.json
 setup_hud_config() {
 	info "Setting up HUD config symlink..."
 	create_symlink "${GLOBAL_SETUP}/plugins/claude-hud/config.json" "${CLAUDE_DIR}/plugins/claude-hud/config.json" "plugins/claude-hud/config.json"
 }
 
-# Step 9: Symlink task-tracker.json
 setup_task_tracker() {
 	info "Setting up task-tracker.json symlink..."
 	create_symlink "${GLOBAL_SETUP}/task-tracker.json" "${CLAUDE_DIR}/task-tracker.json" "task-tracker.json"
 }
 
-# Step 10: Symlink scripts/ (hook scripts)
 setup_scripts() {
 	info "Setting up scripts symlink..."
 	create_symlink "${GLOBAL_SETUP}/scripts" "${CLAUDE_DIR}/scripts" "scripts/"
 }
 
-# Step 11: Symlink hooks/
 setup_hooks() {
 	info "Setting up hooks symlink..."
 	create_symlink "${GLOBAL_SETUP}/hooks" "${CLAUDE_DIR}/hooks" "hooks/"
 }
 
-# Step 12: Symlink friction-log files
 setup_friction_logs() {
 	info "Setting up friction-log symlinks..."
 	local THREE_B_CLAUDE="${THREE_B}/.claude"
@@ -233,26 +256,31 @@ setup_friction_logs() {
 	fi
 }
 
-# Step 13: Symlink skills/
 setup_skills() {
 	info "Setting up skills symlink..."
 	create_symlink "${THREE_B}/.claude/skills" "${CLAUDE_DIR}/skills" "skills/"
 }
 
-# Step 14: Symlink RTK.md
 setup_rtk() {
 	info "Setting up RTK.md symlink..."
 	create_symlink "${GLOBAL_SETUP}/RTK.md" "${CLAUDE_DIR}/RTK.md" "RTK.md"
 }
 
-# Step 15-17: Setup work profile (~/.claude-work)
+# --- Work profile (opt-in) --------------------------------------------------
 setup_work_profile() {
+	if [ "$INSTALL_WORK_PROFILE" != "1" ]; then
+		info "Work profile: skipping (set FORGE_INSTALL_WORK_PROFILE=1 to enable)"
+		return
+	fi
+
 	info "Setting up work profile (~/.claude-work)..."
 
-	# Create directories
-	mkdir -p "${CLAUDE_WORK_DIR}/plugins/claude-hud"
+	if [ "$DRY_RUN" = "1" ]; then
+		dry_msg "mkdir -p ${CLAUDE_WORK_DIR}/plugins/claude-hud"
+	else
+		mkdir -p "${CLAUDE_WORK_DIR}/plugins/claude-hud"
+	fi
 
-	# Chain shared config through ~/.claude (not directly to 3B)
 	local CHAIN_ITEMS=(
 		"CLAUDE.md"
 		"CUSTOMIZATIONS.md"
@@ -272,15 +300,12 @@ setup_work_profile() {
 		create_symlink "${CLAUDE_DIR}/${item}" "${CLAUDE_WORK_DIR}/${item}" "work: ${item}"
 	done
 
-	# HUD config chains through personal
 	create_symlink "${CLAUDE_DIR}/plugins/claude-hud/config.json" \
 		"${CLAUDE_WORK_DIR}/plugins/claude-hud/config.json" \
 		"work: plugins/claude-hud/config.json"
 
-	# Skills symlink (chain through personal, consistent with other items)
 	create_symlink "${CLAUDE_DIR}/skills" "${CLAUDE_WORK_DIR}/skills" "work: skills/"
 
-	# agents and ide directories (chain through personal)
 	if [ -d "${CLAUDE_DIR}/agents" ]; then
 		create_symlink "${CLAUDE_DIR}/agents" "${CLAUDE_WORK_DIR}/agents" "work: agents/"
 	fi
@@ -288,25 +313,33 @@ setup_work_profile() {
 		create_symlink "${CLAUDE_DIR}/ide" "${CLAUDE_WORK_DIR}/ide" "work: ide/"
 	fi
 
-	# Work-specific settings.local.json (overrides statusLine + enabledMcpjsonServers)
-	create_symlink "${GLOBAL_SETUP}/settings.local.work.json" \
-		"${CLAUDE_WORK_DIR}/settings.local.json" \
-		"work: settings.local.json (work overrides)"
+	if [ -f "${GLOBAL_SETUP}/settings.local.work.json" ]; then
+		create_symlink "${GLOBAL_SETUP}/settings.local.work.json" \
+			"${CLAUDE_WORK_DIR}/settings.local.json" \
+			"work: settings.local.json (work overrides)"
+	else
+		warning "settings.local.work.json not found in 3B — work overrides skipped"
+	fi
 
 	success "Work profile setup complete"
 }
 
-# Print summary
+# --- Summary ----------------------------------------------------------------
 print_summary() {
 	echo ""
 	echo "=============================================="
 	echo -e "${GREEN}Setup Complete!${NC}"
 	echo "=============================================="
 	echo ""
-	echo "Dotfiles submodule:"
-	echo "  - ~/dev/personal/dotfiles → 3b/dotfiles/"
+	echo "Source repo:  ${THREE_B}"
+	echo "Forge root:   ${FORGE_HOME}"
 	echo ""
-	echo "Personal profile (~/.claude → 3B):"
+	if [ -d "$DOTFILES_TARGET" ]; then
+		echo "Dotfiles:"
+		echo "  - ${DOTFILES_LINK} → ${DOTFILES_TARGET}"
+		echo ""
+	fi
+	echo "Personal profile (~/.claude → \$FORGE_3B_ROOT):"
 	echo "  - settings.json (shared base)"
 	echo "  - commands/ scripts/ hooks/ skills/"
 	echo "  - CLAUDE.md CUSTOMIZATIONS.md RTK.md"
@@ -314,10 +347,12 @@ print_summary() {
 	echo "  - plugins/claude-hud/config.json task-tracker.json"
 	echo "  - friction-log.json friction-log-archive.json"
 	echo ""
-	echo "Work profile (~/.claude-work → ~/.claude chain):"
-	echo "  - All shared config chained through personal"
-	echo "  - settings.local.json → work overrides (statusLine, MCP)"
-	echo ""
+	if [ "$INSTALL_WORK_PROFILE" = "1" ]; then
+		echo "Work profile (~/.claude-work → ~/.claude chain):"
+		echo "  - All shared config chained through personal"
+		echo "  - settings.local.json → work overrides (statusLine, MCP)"
+		echo ""
+	fi
 
 	echo -e "${YELLOW}Next steps:${NC}"
 	echo ""
@@ -332,25 +367,27 @@ print_summary() {
 	echo "  3. Apply HUD patches (for multi-account support):"
 	echo "     ~/.claude/claude-hud-patches/claude-hud-post-patches.sh"
 	echo ""
-	echo "  4. Login to work profile:"
-	echo "     CLAUDE_CONFIG_DIR=~/.claude-work claude"
-	echo ""
+	if [ "$INSTALL_WORK_PROFILE" = "1" ]; then
+		echo "  4. Login to work profile:"
+		echo "     CLAUDE_CONFIG_DIR=~/.claude-work claude"
+		echo ""
+	fi
 
 	echo "Commands available:"
 	echo "  /commit, /wrap, /clean-review, /validate-pr-reviews, ..."
 	echo ""
 
 	echo "Documentation:"
-	echo "  - README.md - Setup overview"
-	echo "  - CUSTOMIZATIONS.md - Detailed patch documentation"
+	echo "  - installer/README.md — setup overview + env vars"
+	echo "  - CUSTOMIZATIONS.md — detailed patch documentation"
 	echo ""
 }
 
-# Main execution
+# --- Main -------------------------------------------------------------------
 main() {
 	echo ""
 	echo "=============================================="
-	echo "Global ~/.claude Setup"
+	echo "3b-forge Installer — Global ~/.claude Setup"
 	echo "=============================================="
 	echo ""
 
@@ -374,5 +411,4 @@ main() {
 	print_summary
 }
 
-# Run main
 main "$@"
