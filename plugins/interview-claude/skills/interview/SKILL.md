@@ -4,7 +4,7 @@ description: "Socratic interview to crystallize vague requirements into clear sp
 aliases: [socratic]
 ---
 
-# /interview-claude:interview
+# /3b:interview
 
 Socratic interview that turns a vague request ("build a payment module",
 "add search to my app") into a concrete, actionable specification via
@@ -13,7 +13,7 @@ structured questioning. Works across Claude Code, Codex, and Gemini CLI.
 ## Usage
 
 ```
-/interview-claude:interview [topic]
+/3b:interview [topic]
 ```
 
 **Trigger keywords:** "interview me", "clarify requirements", "socratic interview"
@@ -33,33 +33,12 @@ different platform:
 
 ## Instructions
 
-### Step 0 — Load MCP tools (TOMBSTONED for v0.1.0-alpha)
-
-> **v0.1.0-alpha note:** The `interview-ai` PyPI package with the MCP
-> server is **not yet shipped**. Skip this step and proceed directly to
-> **Path B (fallback)**.
->
-> In v0.2.0+, this step will run:
->
-> ```
-> ToolSearch query: "+interview-claude"
-> ```
->
-> If the tool is found → proceed to **Path A (MCP mode)**. If not → fall
-> back to Path B.
-
-For v0.1.0-alpha, always use **Path B** below.
-
-### Path A — MCP Mode (v0.2.0+; not available in alpha)
-
-Not available in `v0.1.0-alpha`. When the `interview-ai` package ships
-in v0.2.0, this path will use the `interview-claude_interview` MCP tool for
-persistent, numerically-gated interviews with session_id handoff.
-
-### Path B — Agent Fallback (primary path in v0.1.0-alpha)
-
-If MCP is unavailable (always, in alpha), fall back to an in-conversation
-interview driven by the socratic-interviewer role.
+The interview runs as an in-conversation flow driven by the
+socratic-interviewer role and rotating perspectives (see step B.6). No
+MCP tools, no Python runtime, no persistence — the host conversation is
+the engine. For a Python-engine variant with numerical ambiguity
+scoring and file-locked state, see
+[`plugins/interview-codex/`](../../../interview-codex/).
 
 #### B.1 — Adopt the interviewer role
 
@@ -292,10 +271,10 @@ On Gemini CLI, use `ask_user` in place of `AskUserQuestion`. The argument
 shapes are slightly different — consult Gemini CLI docs for the current
 spec.
 
-## Example Session (Path B)
+## Example Session
 
 ```
-User: /interview-claude:interview Add payment module to existing project
+User: /3b:interview Add payment module to existing project
 
 (Perspective: researcher)
 Q1: "Is this a greenfield or brownfield project? If brownfield, what's
@@ -389,6 +368,3 @@ implementation.
 After the summary is written, it's yours — paste it into a design doc,
 PR description, ticket, or spec template. The skill's job ends at the
 summary; downstream workflows are up to you.
-
-In v0.2.0, the MCP variant will additionally emit a `session_id` you can
-pass to seed-generation tooling for an automated handoff.

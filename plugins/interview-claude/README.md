@@ -1,12 +1,33 @@
-# interview-claude
+# 3b (a.k.a. interview-claude)
 
-Snapshot of a Socratic-interview plugin built from analysis of the upstream
-[Ouroboros](https://github.com/Q00/ouroboros) `interview` skill.
+Socratic-interview plugin for the 3b-harness, built from analysis of
+the upstream [Ouroboros](https://github.com/Q00/ouroboros) `interview`
+skill.
 
-> **Status:** `v0.0.1` — **not-for-use snapshot**. Held side-by-side with
-> [`../interview-codex/`](../interview-codex/) pending a cross-variant
-> analysis. After that comparison one of the two (or a merged best-of)
-> will be promoted. Do not install this yet.
+> **Status:** `v0.0.1` — **not-for-use snapshot**. Held side-by-side
+> with [`../interview-codex/`](../interview-codex/) as a deliberate
+> design-axis experiment (prompt-heavy vs engine-heavy — see
+> [../../consolidated-plan.md](../../consolidated-plan.md) §3).
+> Do not install yet.
+
+## Graduation criterion (0.0.1 → 0.1.0)
+
+We bump to `0.1.0` when this plugin is **ready-to-use-out-of-the-box
+as a harness library** — meaning:
+
+1. All P1+P2 items in [`../../consolidated-plan.md`](../../consolidated-plan.md)
+   Workstream B have landed (perspective-rotation decision table is
+   explicit, seed-closer 6-dim rubric is codified, session-continuity
+   transcript convention is in place).
+2. The slash command (`/3b:interview`) works end-to-end on a fresh
+   Claude Code install with no manual file shuffling.
+3. `docs/interview-skill/10-variant-comparison.md` exists so users
+   understand why both plugins ship.
+4. At least 2 golden transcript fixtures demonstrate the playbook on
+   greenfield and brownfield inputs.
+
+Until all four are true, the version stays at `0.0.1` and the keyword
+list keeps `not-for-use` as an install guard.
 
 ## Snapshot intent
 
@@ -16,40 +37,42 @@ interview skill":
 - Claude-session-authored, analysis-driven.
 - Cross-agent (Claude Code / Codex / Gemini CLI) skill format from day
   one.
-- Path B (agent fallback) only in this snapshot — Path A (MCP) deferred
-  until after the cross-variant decision.
-- Seven agent prompts: six inherited (socratic-interviewer, seed-closer,
-  researcher, simplifier, architect, breadth-keeper) plus the ontologist
-  (added beyond upstream's default five).
+- Pure-markdown primary workflow — no MCP dependency, no Python
+  runtime. (The earlier dual-path design with a deferred MCP mode has
+  been dropped; a future numerical-scoring variant is the separate
+  [`../interview-codex/`](../interview-codex/) plugin.)
+- Seven agent prompts: six inherited (socratic-interviewer,
+  seed-closer, researcher, simplifier, architect, breadth-keeper) plus
+  the ontologist (added beyond upstream's default five).
 
 The alternate in [`../interview-codex/`](../interview-codex/) is a
-Codex-generated portable extraction that already ships a Python scoring
-core and its own skill. The two are deliberately different in scope so
-we can compare approaches.
+Codex-generated portable extraction that ships a Python scoring core
+and its own skill. The two are deliberately different in scope — see
+[../../consolidated-plan.md](../../consolidated-plan.md) §3 for the
+design-axis thesis.
 
-## Why you can't use it yet
+## Current gaps (v0.1.0 blockers)
 
-1. Slash command name `/interview-claude:interview` is a placeholder —
-   final naming decided post-comparison.
-2. No numerical ambiguity gate (scoring lives in the `interview-codex`
-   variant's Python core, not ported here yet).
-3. No persistence — Path B only; every interview is conversation-only.
-4. Docs reference `interview-ai` as the Phase 2 package name, but that
-   package is not yet written.
+1. Perspective rotation decision table needs expansion (SKILL.md §B.6
+   has the table; integration tests via golden transcripts pending).
+2. `seed-closer.md` 6-dim rubric not yet codified as per-dimension
+   observable signals.
+3. No session-continuity convention (transcript path under
+   `projects/*/actives/` not yet documented).
 
-After cross-analysis, the chosen direction will get a real v0.1.0
-release and install instructions.
+Full backlog in [`../../consolidated-plan.md`](../../consolidated-plan.md)
+Workstream B.
 
 ## How to read this snapshot
 
 - [`.claude-plugin/plugin.json`](./.claude-plugin/plugin.json) —
-  manifest; note the `keywords: [..., "snapshot", "not-for-use"]` flag.
-- [`skills/interview/SKILL.md`](./skills/interview/SKILL.md) — dual-path
-  playbook (Path A tombstoned, Path B primary). Start here for how the
-  skill actually behaves.
+  manifest (plugin `name: 3b`, `v0.0.1`; `not-for-use` keyword as
+  install guard).
+- [`skills/interview/SKILL.md`](./skills/interview/SKILL.md) — primary
+  workflow playbook. Start here for how the skill actually behaves.
 - [`agents/`](./agents/) — the seven role prompts loaded per round.
 - [`commands/interview.md`](./commands/interview.md) — slash-command
-  entry stub.
+  entry stub for `/3b:interview`.
 
 ## Design reference
 
@@ -64,18 +87,20 @@ Key decision doc:
 [`09-plugin-build-decisions.ko.md`](../../docs/interview-skill/09-plugin-build-decisions.ko.md)
 (Korean).
 
-Note: the docs were written when the plugin name was `ask-socratic` and
-later `interview`. The final name here is `interview-claude` to pair
-visibly with `interview-codex`.
+Note: the docs were written when the plugin name was `ask-socratic`,
+then `interview`, then `interview-claude`. The plugin's **manifest
+name** is now `3b` (so the slash command is `/3b:interview`); the
+**directory name** remains `interview-claude` to preserve its pair
+with `interview-codex`.
 
 ## File layout
 
 ```
 plugins/interview-claude/
-├── .claude-plugin/plugin.json       # manifest (name: interview-claude, v0.0.1)
-├── commands/interview.md            # slash-command entry stub
+├── .claude-plugin/plugin.json       # manifest (name: 3b, v0.0.1)
+├── commands/interview.md            # /3b:interview entry stub
 ├── skills/interview/
-│   ├── SKILL.md                     # dual-path playbook
+│   ├── SKILL.md                     # primary workflow
 │   └── references/
 │       ├── codex-tools.md           # Claude→Codex tool mapping
 │       └── gemini-tools.md          # Claude→Gemini tool mapping

@@ -23,11 +23,17 @@ related:
 >    **not-for-use 스냅샷**이지, 배포 가능한 빌드가 아님.
 >
 > 이 문서를 읽을 때: `ask-socratic`은 `interview-claude`로, `ask-socratic-ai`
-> (Phase 2 PyPI 패키지)는 `interview-ai`로 읽으면 됨. 슬래시 커맨드는
-> `/interview-claude:interview`. 레포 루트의 CHANGELOG에서 전체 이름 변경
-> 기록 참조. Phase 2 / Phase 3 빌드 플랜은 여전히 유효하지만 —
-> `interview-claude` vs `interview-codex` cross-variant 비교에서 승자가
-> 결정된 *후에만* 적용됨.
+> (Phase 2 PyPI 패키지)는 `interview-ai`로 읽으면 됨 (deprecated — 아래
+> Phase 2 노트 참조). 슬래시 커맨드는 `/3b:interview` (manifest
+> `name: 3b`; 이전에는 `/interview-claude:interview`). 레포 루트의
+> CHANGELOG에서 전체 이름 변경 기록 참조.
+>
+> **Phase 2 / MCP 노트 (2026-04-23 업데이트):** 듀얼 패스 설계
+> (Path A = `interview-ai` PyPI 패키지 기반 MCP, Path B = agent
+> fallback)는 철회됨. `interview-claude`는 prompt-heavy single-path로
+> 출시되고, engine-heavy 변종은 별도 `interview-codex` 플러그인임.
+> 아래에서 언급되는 `interview-ai` 패키지는 작성된 적이 없으며 더 이상
+> 계획에 없음.
 
 ## 개정 — 2026-04-23
 

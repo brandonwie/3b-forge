@@ -24,11 +24,17 @@ related:
 >
 > When reading the rest of this doc: where it says `ask-socratic` read
 > `interview-claude`; where it says `ask-socratic-ai` (Phase 2 PyPI
-> package) read `interview-ai`. Slash command is
-> `/interview-claude:interview`. See the root CHANGELOG for the full
-> rename record. The Phase 2 / Phase 3 build plan still applies — but
-> only *after* the cross-variant comparison picks a winner between
-> `interview-claude` and `interview-codex`.
+> package) read `interview-ai` (deprecated — see Phase 2 note below).
+> Slash command is now `/3b:interview` (manifest `name: 3b`;
+> previously `/interview-claude:interview`). See the root CHANGELOG
+> for the full rename record.
+>
+> **Phase 2 / MCP note (2026-04-23 update):** the dual-path design
+> (Path A = MCP via `interview-ai` PyPI package, Path B = agent
+> fallback) was collapsed. `interview-claude` now ships as prompt-heavy
+> single-path; the engine-heavy variant is the separate
+> `interview-codex` plugin. The `interview-ai` package referenced below
+> was never built and is no longer planned.
 
 # Plugin build decisions — cross-agent interview skill fork
 

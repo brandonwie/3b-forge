@@ -1,7 +1,7 @@
 {
-  "name": "interview-claude",
+  "name": "3b",
   "version": "0.0.1",
-  "description": "Socratic interview to crystallize vague requirements. Cross-agent snapshot (Claude Code / Codex / Gemini CLI) pending cross-analysis against interview-codex variant.",
+  "description": "3b-harness plugin set. Currently ships the Socratic `/3b:interview` skill that crystallizes vague requirements into actionable specs via structured questioning. Cross-agent (Claude Code / Codex / Gemini CLI).",
   "author": {
     "name": "Brandon Wie",
     "email": "brandonwie.cs@gmail.com"
@@ -10,6 +10,8 @@
   "homepage": "https://github.com/brandonwie/3b-harness/tree/main/plugins/interview-claude",
   "license": "MIT",
   "keywords": [
+    "3b",
+    "harness",
     "interview",
     "socratic",
     "requirements",
