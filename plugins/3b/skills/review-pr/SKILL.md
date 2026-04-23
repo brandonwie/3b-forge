@@ -251,11 +251,13 @@ If user chose FIX on any findings:
 2. **Apply each fix** in the lead session:
    - Read the affected file
    - Make minimal, targeted fix (no scope creep)
-   - If the fix changes a source file → update corresponding test file (same
-     test mapping rule as `validate-pr-reviews` Phase 5):
+   - If the fix changes a source file → update its corresponding test
+     file, following the project's test-location and test-file-naming
+     convention (same rule as `validate-pr-reviews` Phase 5). Example
+     mapping (substitute your project's own convention):
 
      ```text
-     src/foo/foo.service.ts → src/foo/foo.service.unit.spec.ts
+     src/foo/foo.service.ts → src/foo/foo.service.{test-suffix}
      ```
 
 3. **Run affected tests**: `npx jest {test_file} --no-coverage` for each changed

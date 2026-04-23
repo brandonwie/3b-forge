@@ -84,9 +84,12 @@ and return structured findings for three categories:
 {category_checklist}
 
 ## Clean Code References
-Read these files for detailed principles:
-- `~/.claude/global-claude-setup/commands/clean-review/clean-code-principles.md`
-- `~/.claude/global-claude-setup/commands/clean-review/refactoring-catalog.md`
+If the `clean-review` plugin is installed, load its slash references:
+- `/clean-review:clean-code-principles` — Meaningful Names, Functions, Comments
+- `/clean-review:refactoring-catalog` — Code Smells by Category, Refactoring Workflow
+
+Otherwise consult Robert C. Martin's _Clean Code_ (Ch. 2–4) and Martin
+Fowler's _Refactoring_ catalog directly.
 
 ## Project Context
 {project_context}
@@ -107,9 +110,10 @@ Read these files for detailed principles:
 ## Important
 - Focus on the CHANGED code, but read surrounding code for context
 - Do NOT flag pre-existing issues unless the PR makes them worse
-- Respect project conventions: DateUtil (no native Date), no `!` assertions,
-  no `as Type`, test files named *.unit.spec.ts
-- Apply the "100k blocks" lens for any data structure decisions
+- Respect project conventions declared in `{project_context}` (naming rules,
+  type-safety requirements, test-file location/suffix, JSDoc style, etc.)
+- Apply the scale lens documented in `{project_context}` (e.g., complexity
+  budgets, batching thresholds) if the project declares one
 - Be specific: cite Clean Code chapter/rule when applicable
 ```
 
@@ -156,11 +160,14 @@ and return structured findings for two categories:
 ## Important
 - Focus on the CHANGED code, but read surrounding code for context
 - Do NOT flag pre-existing issues unless the PR makes them worse
-- This is a calendar app where users can have 100k+ blocks — always consider
-  scale implications
-- Complexity targets: O(n) required for >10k items, batching for 100k+
-- Test convention: *.unit.spec.ts (NEVER *.spec.ts)
-- Check: if source file changed, does corresponding test file have updates?
+- Apply scale implications per the project's documented targets in
+  `{project_context}` (if the project has no declared scale profile,
+  default to standard complexity budgets: O(n) for hot paths, batching
+  for bulk mutations)
+- Test convention: follow the project's test-file-naming convention as
+  declared in `{project_context}`
+- Check: if a source file changed, does its corresponding test file
+  (per project's naming rule) have updates?
 ```
 
 ---

@@ -416,11 +416,14 @@ updated.**
 ```text
 Source File Changed          → Test File to Update
 ─────────────────────────────────────────────────────
-src/foo/foo.service.ts       → src/foo/foo.service.unit.spec.ts
-src/foo/foo.controller.ts    → src/foo/foo.controller.unit.spec.ts
-src/foo/dto/bar.dto.ts       → src/foo/dto/bar.dto.unit.spec.ts
-src/common/utils/Foo.ts      → src/common/utils/Foo.unit.spec.ts
+<path>/<name>.<ext>          → <path>/<name>.<test-suffix>
 ```
+
+Substitute the project's own test-file-naming convention for
+`<test-suffix>` (e.g. `.spec.ts`, `.test.ts`, `.unit.spec.ts`,
+`_test.py`). If the project declares its convention in `CLAUDE.md` /
+`TESTING.md`, follow that; otherwise match existing test files in the
+repository.
 
 ### Phase 5.5: Reinforcement Verification Checkpoint
 

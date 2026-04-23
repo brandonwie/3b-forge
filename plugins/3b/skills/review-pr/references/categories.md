@@ -88,17 +88,18 @@ checklist items and NestJS/TypeORM-specific items for this project.
 - [ ] Consistent error handling patterns
 - [ ] Appropriate use of types (no `any` without justification)
 
-**Project-specific conventions:**
+**Project-specific conventions** — load from the caller's `CLAUDE.md` /
+`AGENTS.md` / equivalent project-rules file. Typical items to check for
+here (customize per project):
 
-- [ ] `DateUtil` usage (NEVER use native `Date` — project rule)
-- [ ] No `!` non-null assertions (use type narrowing instead)
-- [ ] No `as Type` assertions (use type guards instead)
-- [ ] Test files named `*.unit.spec.ts` (NEVER `*.spec.ts`)
-- [ ] JSDoc: tags only (`@param`, `@returns`, `@example`), no narrative blocks
-- [ ] Comments: WHY-only, with CRITICAL/BUG/FIX/SECURITY markers
+- Date / time handling rules (native `Date` vs a project-supplied util)
+- Type-safety escape hatches (`!`, `as Type`, `any` without justification)
+- Test file naming + location convention
+- Comment / docstring style
 
-**Cross-reference:** Load `clean-code-principles.md` — Ch.2 (Meaningful Names),
-Ch.3 (Functions), Ch.4 (Comments)
+**Cross-reference:** if `clean-review` plugin is installed, load
+`/clean-review:clean-code-principles` (Ch.2 Meaningful Names, Ch.3
+Functions, Ch.4 Comments).
 
 ### 6. Maintainability & Simplicity
 
@@ -145,16 +146,17 @@ Refactoring Workflow
 - [ ] Inefficient `leftJoinAndSelect` (loading full relation trees)
 - [ ] `save()` vs `update()` — `save()` loads entity first, `update()` doesn't
 
-**Complexity targets (project-specific — calendar app with 100k+ blocks):**
+**Complexity targets (default template — override in project `CLAUDE.md` if
+the project declares its own scale profile):**
 
 | Data Size  | Acceptable Time | Notes                       |
 | ---------- | --------------- | --------------------------- |
 | < 1k items | O(n²) okay      | Small data, simplicity wins |
-| 1k - 10k   | O(n log n) max  | Most users                  |
-| 10k - 100k | O(n) required   | Power users                 |
-| 100k+      | O(n) + batching | Extreme cases               |
+| 1k - 10k   | O(n log n) max  | Typical app scale           |
+| 10k - 100k | O(n) required   | Power-user scale            |
+| 100k+      | O(n) + batching | Extreme scale               |
 
-**Always ask:** "What happens when user has 100k blocks?"
+**Always ask:** "What happens at the project's upper-bound scale?"
 
 ### 5. Test Quality
 
@@ -167,13 +169,16 @@ Refactoring Workflow
 - [ ] Meaningful assertions (not just "doesn't throw")
 - [ ] Edge case coverage (nulls, empty arrays, boundary values)
 
-**Project-specific conventions:**
+**Project-specific conventions** — load from the caller's `CLAUDE.md` /
+`TESTING.md` / equivalent. Typical items to check for here (customize per
+project):
 
-- [ ] Test naming: `*.unit.spec.ts` convention (NEVER `*.spec.ts`)
-- [ ] Mock quality: not testing mocks themselves, realistic test data
-- [ ] Use `createServiceUnitTest()` / `createServiceIntegrationTest()` factories
-- [ ] Timezone testing: explicit UTC times, boundary checks
-- [ ] Mock location: `@test/mocks/` for shared mocks
-- [ ] One service per test file
+- Test file naming + co-location convention
+- Mock quality (realistic data, not testing mocks themselves)
+- Project-supplied test-factory helpers
+- Timezone / time-sensitive test hygiene
+- Mock location convention
+- One-concern-per-test-file rule
 
-**Cross-reference:** Load `TESTING.md` prompt for full testing guidelines
+**Cross-reference:** load the project's `TESTING.md` (or equivalent) for
+full testing guidelines.
