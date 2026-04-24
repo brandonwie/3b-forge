@@ -72,22 +72,13 @@ if [ ! -f "$MANIFEST" ]; then
 	exit 2
 fi
 
-# --- Mode detection ---------------------------------------------------------
-# POST_FLIP=1 means .flip-state.json exists → Checks A/B/E active.
-# POST_FLIP=0 means pre-flip state → Checks A/B/E skip (regular files expected).
-if [ -f "$STATE_FILE" ]; then
-	POST_FLIP=1
-	MODE_LABEL="post-flip"
-else
-	POST_FLIP=0
-	MODE_LABEL="pre-flip"
-fi
-
 # --- Parse manifest ---------------------------------------------------------
 # Emit tab-separated: forge_path<TAB>source_path
 ENTRIES=$(
-	python3 - <<PY
+	MANIFEST="$MANIFEST" python3 - <<'PY'
+import os
 import sys
+
 try:
     import yaml
 except ImportError:
@@ -96,12 +87,34 @@ except ImportError:
         "  Install: pip install pyyaml\n"
     )
     sys.exit(2)
-with open("$MANIFEST") as f:
+with open(os.environ["MANIFEST"]) as f:
     data = yaml.safe_load(f)
 for entry in data.get("entries", []):
     print(f"{entry['forge_path']}\t{entry['source_path']}")
 PY
 )
+
+# --- Mode detection ---------------------------------------------------------
+# POST_FLIP=1 → Checks A/B/E active. Two detection signals:
+#   1. scripts/.flip-state.json exists (authoritative, local state)
+#   2. First manifest entry is already a symlink (topology-inferred)
+# Signal 2 covers fresh forge clones / CI jobs where .flip-state.json is
+# absent but the 3B-side flip has already happened — without it, Checks
+# A/B/E would silently skip and mask real symlink integrity problems.
+FIRST_SOURCE=$(echo "$ENTRIES" | head -n1 | cut -f2)
+if [ -f "$STATE_FILE" ]; then
+	POST_FLIP=1
+	MODE_LABEL="post-flip"
+elif [ -n "$FIRST_SOURCE" ] && [ -L "$FORGE_3B_ROOT/$FIRST_SOURCE" ]; then
+	POST_FLIP=1
+	MODE_LABEL="post-flip (inferred from 3B topology; no state file)"
+	echo "WARNING: .flip-state.json absent but $FIRST_SOURCE is a symlink." >&2
+	echo "  Running Checks A/B/E in post-flip mode inferred from topology." >&2
+	echo "" >&2
+else
+	POST_FLIP=0
+	MODE_LABEL="pre-flip"
+fi
 
 # --- Per-entry checks -------------------------------------------------------
 total=0
