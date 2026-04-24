@@ -137,8 +137,25 @@ while IFS=$'\t' read -r forge_path source_path; do
 	if [ "$POST_FLIP" = "1" ]; then
 		if [ ! -L "$source_abs" ]; then
 			fail_a=$((fail_a + 1))
+			# stat -f '%HT' is BSD/macOS-only and silently errors on GNU/Linux
+			# (where -f switches to filesystem-stat mode). Use python3 for
+			# portability, same pattern as the realpath calls below.
+			actual_kind=$(SOURCE="$source_abs" python3 -c '
+import os
+p = os.environ["SOURCE"]
+if not os.path.lexists(p):
+    print("missing")
+elif os.path.islink(p):
+    print("symlink")
+elif os.path.isdir(p):
+    print("directory")
+elif os.path.isfile(p):
+    print("regular file")
+else:
+    print("other")
+')
 			critical_report="${critical_report}A. NOT-A-SYMLINK | ${source_path}
-  Expected symlink, got: $(stat -f '%HT' "$source_abs" 2>/dev/null || echo 'missing')
+  Expected symlink, got: ${actual_kind}
 "
 			continue
 		fi
