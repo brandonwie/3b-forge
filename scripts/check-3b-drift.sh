@@ -102,11 +102,15 @@ while IFS=$'\t' read -r forge_path source_path source_sha; do
 	[ -z "$forge_path" ] && continue
 	total=$((total + 1))
 
-	# Sanity: does the source_sha exist in 3B?
-	if ! git -C "$FORGE_3B_ROOT" cat-file -e "$source_sha" 2>/dev/null; then
+	# Sanity: does the source_sha exist in 3B, and is it actually a commit?
+	# `cat-file -e` succeeds for any object (blob, tree, tag); without the
+	# `-t == commit` check, `git log ${source_sha}..HEAD` below would abort
+	# the script under `set -e` on non-commit objects.
+	sha_type=$(git -C "$FORGE_3B_ROOT" cat-file -t "$source_sha" 2>/dev/null || echo "")
+	if [ "$sha_type" != "commit" ]; then
 		missing=$((missing + 1))
 		drift_report="${drift_report}UNKNOWN-SHA | ${forge_path}
-  manifest sha: ${source_sha} (not found in 3B repo)
+  manifest sha: ${source_sha} (not a commit in 3B repo; got type=${sha_type:-absent})
 "
 		continue
 	fi
