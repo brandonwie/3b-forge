@@ -36,8 +36,6 @@ Installed per-profile but configured identically in both profiles' settings.
 
 | Plugin                                    | Both Profiles | Provides MCP Tools               | Purpose                     |
 | ----------------------------------------- | ------------- | -------------------------------- | --------------------------- |
-| Plugin                                    | Both Profiles | Provides MCP Tools               | Purpose                     |
-| ----------------------------------------- | ------------- | -------------------------------- | --------------------------- |
 | context7@claude-plugins-official          | Yes           | Yes (`mcp__context7__*`)         | Library doc lookup          |
 | playwright@claude-plugins-official        | Yes           | Yes (`mcp__plugin_playwright_*`) | Browser automation          |
 | frontend-design@claude-plugins-official   | Yes           | No (skill only)                  | UI design skill             |
