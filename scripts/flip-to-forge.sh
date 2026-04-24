@@ -46,7 +46,7 @@ for arg in "$@"; do
 	--execute) MODE="execute" ;;
 	--rollback) MODE="rollback" ;;
 	-h | --help)
-		sed -n '2,32p' "$0"
+		sed -n '2,37p' "$0"
 		exit 0
 		;;
 	*)
