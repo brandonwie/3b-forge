@@ -13,6 +13,24 @@ per plugin.
 ### Harness-level
 
 #### Added
+- 2026-04-24 — **Wave 3 SSoT flip tooling (forge PR #3 scope).** Adds
+  [`scripts/flip-to-forge.sh`](./scripts/flip-to-forge.sh) with
+  `--dry-run`/`--execute`/`--rollback` modes. Computes relative symlink
+  targets via `os.path.relpath` so the 3B → forge links survive `$HOME`
+  changes. `--execute` requires clean 3B tree and writes
+  `scripts/.flip-state.json` for rollback reproducibility. Hard allowlist
+  gates the 18 manifest entries; any out-of-manifest path aborts pre-flight.
+  The 3B-side flip is executed with this script AFTER forge PR #3 merges;
+  this release ships only the tooling.
+- 2026-04-24 — **Drift check rewrite for post-flip topology.**
+  [`scripts/check-3b-drift.sh`](./scripts/check-3b-drift.sh) replaces the
+  `git log SHA..HEAD` commit count (meaningless once 3B symlinks into forge)
+  with five topology checks: A symlink integrity, B wrong target, C
+  untracked Tier-A candidates, D reintroduced hardcoded paths, E
+  plugin-reinstall damage. Checks A/B/E activate only when
+  `scripts/.flip-state.json` is present, preserving back-compat with the
+  pre-flip state. Emergency recovery of the old logic:
+  `git show wave2-backup:scripts/check-3b-drift.sh`.
 - 2026-04-24 — **Wave 2 Tier-B parameterization + drift tracking.** `installer/setup.sh`
   rewritten to read the 3B path from `$FORGE_3B_ROOT` (required; fail-fast
   if unset); script-relative path resolution via `${BASH_SOURCE[0]}`; `--dry-run`
@@ -42,6 +60,15 @@ per plugin.
   appending to their installed `CLAUDE.md`.
 
 #### Changed
+- 2026-04-24 — `plugins/3b/PUBLIC-PRIVATE-SPLIT.md` — tier classification
+  is now manifest-driven for shipped files. The content-grep rubric is
+  retained as a candidate-scoring tool for new 3B files being evaluated
+  for migration. Drift section updated to document the five-check
+  topology.
+- 2026-04-24 — `plugins/3b/README.md` — adds Wave 3 SSoT topology mermaid
+  diagram and bumps the status header to v0.0.4.
+- 2026-04-24 — `CLAUDE.md` — adds "SoT ownership" section making explicit
+  that shared content is edited in forge, not in 3B.
 - `installer/README.md` — Wave 1 WIP banner removed; environment-variable
   docs added (FORGE_3B_ROOT, FORGE_HOME, FORGE_DOTFILES_LINK,
   FORGE_INSTALL_WORK_PROFILE, FORGE_DRY_RUN); drift-detection section
