@@ -82,8 +82,6 @@ per plugin.
   topology.
 - 2026-04-24 — `plugins/3b/README.md` — adds Wave 3 SSoT topology mermaid
   diagram and bumps the status header to v0.0.4.
-- 2026-04-24 — `CLAUDE.md` — adds "SoT ownership" section making explicit
-  that shared content is edited in forge, not in 3B.
 - `installer/README.md` — Wave 1 WIP banner removed; environment-variable
   docs added (FORGE_3B_ROOT, FORGE_HOME, FORGE_DOTFILES_LINK,
   FORGE_INSTALL_WORK_PROFILE, FORGE_DRY_RUN); drift-detection section
