@@ -151,8 +151,12 @@ while IFS=$'\t' read -r forge_path source_path; do
 		fi
 
 		# Check B — wrong target.
-		actual_resolved=$(cd "$(dirname "$source_abs")" && cd "$(dirname "$(readlink "$source_abs")")" && pwd)/$(basename "$(readlink "$source_abs")")
-		expected_resolved="$forge_abs"
+		# Use python3 os.path.realpath for portability: macOS (BSD) readlink
+		# lacks -f, and a shell `cd ... && pwd` chain mis-resolves relative
+		# targets containing multiple `..` components. realpath normalises
+		# both sides so the equality compare is honest.
+		actual_resolved=$(SOURCE="$source_abs" python3 -c 'import os, sys; print(os.path.realpath(os.environ["SOURCE"]))')
+		expected_resolved=$(FORGE="$forge_abs" python3 -c 'import os, sys; print(os.path.realpath(os.environ["FORGE"]))')
 		if [ "$actual_resolved" != "$expected_resolved" ]; then
 			fail_b=$((fail_b + 1))
 			critical_report="${critical_report}B. WRONG-TARGET | ${source_path}
