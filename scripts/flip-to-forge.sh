@@ -101,13 +101,18 @@ if [ "$MODE" = "rollback" ]; then
 	echo "Rollback mode. Baseline: $BASELINE_SHA"
 	echo ""
 
-	ENTRIES=$(python3 -c "
+	# Env-var + quoted heredoc prevents shell-into-python interpolation
+	# hazards when paths contain single quotes or other special characters.
+	ENTRIES=$(
+		STATE_FILE="$STATE_FILE" python3 - <<'PY'
 import json
-with open('$STATE_FILE') as f:
+import os
+with open(os.environ["STATE_FILE"]) as f:
     data = json.load(f)
-for e in data['entries']:
-    print(e['source_path'])
-")
+for e in data["entries"]:
+    print(e["source_path"])
+PY
+	)
 
 	restored=0
 	failed=0
@@ -160,8 +165,10 @@ BASELINE_SHA=$(git -C "$FORGE_3B_ROOT" rev-parse HEAD)
 # --- Parse manifest ---------------------------------------------------------
 # Emit tab-separated: forge_path<TAB>source_path
 ENTRIES=$(
-	python3 - <<PY
+	MANIFEST="$MANIFEST" python3 - <<'PY'
+import os
 import sys
+
 try:
     import yaml
 except ImportError:
@@ -171,7 +178,7 @@ except ImportError:
         "  (or: brew install libyaml && pip install pyyaml)\n"
     )
     sys.exit(2)
-with open("$MANIFEST") as f:
+with open(os.environ["MANIFEST"]) as f:
     data = yaml.safe_load(f)
 for entry in data.get("entries", []):
     print(f"{entry['forge_path']}\t{entry['source_path']}")
@@ -210,8 +217,12 @@ while IFS=$'\t' read -r forge_path source_path; do
 		continue
 	fi
 
-	# Compute relative target: from dir-of-source to forge_abs
-	rel_target=$(python3 -c "import os; print(os.path.relpath('$forge_abs', os.path.dirname('$source_abs')))")
+	# Compute relative target: from dir-of-source to forge_abs.
+	# Env-var passing keeps paths out of shell-interpolated Python source.
+	rel_target=$(FORGE_ABS="$forge_abs" SOURCE_ABS="$source_abs" python3 -c '
+import os
+print(os.path.relpath(os.environ["FORGE_ABS"], os.path.dirname(os.environ["SOURCE_ABS"])))
+')
 
 	PLAN="${PLAN}${source_abs}	${forge_abs}	${rel_target}
 "
