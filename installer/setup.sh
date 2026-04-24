@@ -47,7 +47,7 @@ for arg in "$@"; do
 	case "$arg" in
 	--dry-run) DRY_RUN=1 ;;
 	-h | --help)
-		sed -n '2,44p' "$0"
+		sed -n '2,40p' "$0"
 		exit 0
 		;;
 	*)
