@@ -180,9 +180,12 @@ echo "▸ Projects (repos → 3B)"
 # (example — uncomment and customize for your own repos)
 # check_project "myproject" "$HOME/dev/personal/myproject" "$THREE_B/projects/myproject"
 
-# Dotfiles submodule (optional — skipped if $THREE_B/dotfiles doesn't exist)
-if [ -L "$HOME/dev/personal/dotfiles" ] || [ -d "$THREE_B/dotfiles" ]; then
-	check "$HOME/dev/personal/dotfiles" "$THREE_B/dotfiles" "Dotfiles"
+# Dotfiles submodule (optional — skipped if $THREE_B/dotfiles doesn't exist).
+# Matches installer/setup.sh: honor FORGE_DOTFILES_LINK so custom layouts
+# are checked at the right location instead of false MISSING/skip.
+DOTFILES_LINK="${FORGE_DOTFILES_LINK:-$HOME/dev/personal/dotfiles}"
+if [ -L "$DOTFILES_LINK" ] || [ -d "$THREE_B/dotfiles" ]; then
+	check "$DOTFILES_LINK" "$THREE_B/dotfiles" "Dotfiles"
 fi
 
 # ─── Report ────────────────────────────────────────────────────
