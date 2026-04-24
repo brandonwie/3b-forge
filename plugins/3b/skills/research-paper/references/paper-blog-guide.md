@@ -63,7 +63,7 @@ Numbers and comparisons. Be specific.
 
 ### 5. My Take — Practical Applications (2-3 paragraphs, USER-INFLUENCED)
 
-This is where Brandon's perspective adds unique value.
+This is where the maintainer's perspective adds unique value.
 
 - How does this relate to systems I've built?
 - What would I change in my current architecture based on this?
