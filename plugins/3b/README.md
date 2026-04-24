@@ -155,7 +155,7 @@ All manifests declare the same plugin `name: "3b"` and point to the same
 `skills/` directory. The only per-host difference is the manifest schema
 itself.
 
-## Graduation criterion (v0.0.2 → v0.1.0)
+## Graduation criterion (v0.0.4 → v0.1.0)
 
 Bump to `v0.1.0` when ready-to-use-out-of-the-box as a forge library:
 
