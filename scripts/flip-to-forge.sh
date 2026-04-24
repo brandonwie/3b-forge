@@ -307,7 +307,7 @@ import os
 
 state = {
     "baseline_sha": os.environ["BASELINE_SHA"],
-    "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+    "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z"),
     "forge_home": os.environ["FORGE_HOME"],
     "forge_3b_root": os.environ["FORGE_3B_ROOT"],
     "entries": [],
