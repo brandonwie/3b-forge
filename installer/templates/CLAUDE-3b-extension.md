@@ -1,3 +1,10 @@
+---
+tags: [3b, methodology, claude-md, extension, installer]
+created: 2026-04-24
+updated: 2026-04-24
+status: completed
+---
+
 # 3B Methodology Extension
 
 Append this file's content to your `CLAUDE.md` if you adopt the 3B
