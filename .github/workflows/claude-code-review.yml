@@ -1,0 +1,92 @@
+name: Claude Code Review
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-review:
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '@claude review')
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Validate Claude token
+        env:
+          CLAUDE_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -z "$CLAUDE_TOKEN" ]; then
+            echo "::error::No CLAUDE_CODE_OAUTH_TOKEN secret configured. Set it in repo Settings - Secrets and variables - Actions."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.issue.number }}
+
+            Please review this pull request.
+
+            ## Project Context
+
+            3b-forge is the Forge layer of the 3B taxonomy (Brain/Forge/Plugin/Runtime).
+            macOS-only harness. Primary artifact: `plugins/3b/` — a Claude Code plugin
+            acting as SSoT for 18 shared skills/rules/agents/hooks consumed by the 3B
+            Brain repo via relative symlinks. Stack: Bash scripts, YAML, Markdown,
+            Claude Code plugin spec. No runtime server; installers + drift checkers.
+
+            ## Review Categories
+
+            1. Security — Shell injection in scripts, hardcoded absolute paths leaking
+               user context, secrets in committed files, unsafe `eval`/`rm -rf`
+            2. Portability — macOS-only assumptions (BSD vs GNU coreutils), bash
+               version gates, `realpath`/`readlink` fallbacks, Python3 usage
+            3. Plugin Correctness — plugin.json schema, `.claude-plugin/` location,
+               slash-command namespace (directory name = prefix), hook contracts
+               (fail-open vs fail-closed), SOURCE-MANIFEST.yaml drift vectors
+            4. Shell Quality — `set -euo pipefail`, quoted expansions, error traps,
+               rollback contracts for destructive ops (flip/migrate scripts)
+            5. Documentation — YAML frontmatter presence (`tags`, `created`,
+               `updated`, `status`), 5W1H structure on knowledge entries, Mermaid
+               (not ASCII box art), broken relative links, stale `when_used:` refs
+            6. Change Discipline — Atomic commits (one logical change), Conventional
+               Commits (`type(scope): subject`), no `git add -A` patterns
+            7. SSoT Integrity — Symlink direction (Forge is SoT, 3B consumes),
+               `SOURCE-MANIFEST.yaml` entries match actual files, no duplicate
+               content between Forge and Brain
+
+            ## Project Conventions (Do NOT Flag)
+
+            - `docs/` in 3B-connected repos is a gitignored symlink — not a bug
+            - `CLAUDE.md` may be a symlink to `3b/.claude/project-claude/` — edit source
+            - Journals/CHANGELOG history stay verbatim during renames (historical refs)
+            - Tier-B skills parameterized via local config, not hardcoded project names
+            - `tmp/` is scratch-only, not for committed artifacts
+            - Python3 realpath fallback is intentional (macOS BSD `realpath` gap)
+            - Fail-open hook contract is intentional for installer hooks
+
+            ## Output Instructions
+
+            Use `gh pr comment` for top-level feedback.
+            Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`) to highlight specific code issues.
+            Only post GitHub comments — do not submit review text as messages.
+
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
