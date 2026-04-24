@@ -13,6 +13,21 @@ per plugin.
 ### Harness-level
 
 #### Added
+- 2026-04-24 — **`@claude review` GHA workflow split.** Adds
+  [`.github/workflows/claude-code-review.yml`](./.github/workflows/claude-code-review.yml)
+  — dedicated `issue_comment` handler firing on `@claude review` against PRs
+  only (gated by `github.event.issue.pull_request`). 3b-forge-tuned prompt
+  with 7 review categories (Security, Portability, Plugin Correctness, Shell
+  Quality, Docs, Change Discipline, SSoT Integrity) and do-NOT-flag
+  conventions (symlink `docs/`, verbatim rename history, Tier-B
+  parameterization, macOS realpath fallback, fail-open hooks).
+  `track_progress: true`. Scoped `--allowedTools` to `gh pr comment/diff/view`
+  + inline-comment MCP. Modifies existing
+  [`.github/workflows/claude.yml`](./.github/workflows/claude.yml) to add
+  `!contains(..., '@claude review')` exclusion guard (prevents double-fire)
+  and a token-validation preflight step. Deliberately skips
+  `environment: claude-${{ github.actor }}` gating — unnecessary for a solo
+  personal repo.
 - 2026-04-24 — **Wave 3 SSoT flip tooling (forge PR #3 scope).** Adds
   [`scripts/flip-to-forge.sh`](./scripts/flip-to-forge.sh) with
   `--dry-run`/`--execute`/`--rollback` modes. Computes relative symlink
