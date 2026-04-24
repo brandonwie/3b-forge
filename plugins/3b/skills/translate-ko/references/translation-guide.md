@@ -326,9 +326,9 @@ Redis는 메모리 기반 저장소라서 엄청 빠릅니다.
 
 ## Voice Calibration (Writing Examples)
 
-Before translating, read Brandon's Korean writing samples from
-`~/dev/personal/3b/personal/writing-examples/` (most recent first). These
-capture his natural professional Korean voice.
+Before translating, read the maintainer's Korean writing samples from
+`${FORGE_3B_ROOT}/personal/writing-examples/` (most recent first) if available.
+These capture the natural professional Korean voice.
 
 ### Register Difference
 
@@ -400,7 +400,7 @@ qa_checklist:
   - register_consistent: true
   - no_pronoun_you: true
 voice_calibration:
-  source: "~/dev/personal/3b/personal/writing-examples/"
+  source: "${FORGE_3B_ROOT}/personal/writing-examples/"
   register_note: "Examples use 한다체; convert endings to 해요체"
   extract: ["vocabulary", "sentence_patterns", "english_mixing", "connectives"]
   ignore: ["sentence_endings", "formality_level"]

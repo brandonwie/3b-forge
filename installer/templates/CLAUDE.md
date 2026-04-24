@@ -1,14 +1,8 @@
-<!--
-⚠️ WAVE 1 STATUS — 3B-opinionated reference template.
-This file references `3b/.claude/rules/*` paths that only exist inside the
-maintainer's private 3B repo. Wave 2 will strip those references and split
-this file into a minimal universal CLAUDE.md plus an optional 3B-methodology
-extension. For now, treat this as reference, not as a ready-to-install template.
--->
-
 # Global Claude Instructions
 
-These instructions apply to ALL projects.
+These instructions apply to ALL projects. If you adopt the 3B
+(knowledge-management) methodology, append `CLAUDE-3b-extension.md` to this
+file.
 
 ---
 
@@ -16,11 +10,20 @@ These instructions apply to ALL projects.
 
 ### 1. YAML Frontmatter
 
-Every markdown file MUST have YAML frontmatter. Minimum: `tags:`, `created:`,
-`updated:`, `status:` (values: not-started / in-progress / completed). Full 3B
-schema with optional fields (`source`, `projects`, `related`, `when_used`,
-`references`, `confidence`, `blog`) in
-`3b/.claude/rules/yaml-frontmatter-schema.md` — auto-loads when editing `.md`.
+Every markdown file MUST have YAML frontmatter. Minimum:
+
+```yaml
+---
+tags: [topic, area]
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+status: not-started | in-progress | completed
+---
+```
+
+Optional fields: `source`, `projects`, `related`, `when_used`, `references`,
+`confidence`, `blog`. If you use the 3b plugin, the full schema lives at
+`plugins/3b/rules/yaml-frontmatter-schema.md`.
 
 ### 2. Cross-Referencing
 
@@ -31,9 +34,9 @@ schema with optional fields (`source`, `projects`, `related`, `when_used`,
 
 ### 3. 5W1H Documentation
 
-Knowledge entries answer **Who / When / Where / What / Why / How**. Full
-template + required sections in `3b/.claude/rules/knowledge-creation.md` —
-auto-loads when editing `knowledge/`.
+Knowledge entries answer **Who / When / Where / What / Why / How**. If you use
+the 3b plugin, full template + required sections live at
+`plugins/3b/rules/knowledge-creation.md`.
 
 ### 4. Decision Documentation Protocol
 
@@ -67,15 +70,15 @@ involves trade-offs, or costs significant time.
 - **Progressive layers** — journal → knowledge → guide → architecture → blog.
 
 Frontmatter connects notes; connections turn isolated notes into a networked
-brain. Templates in `3b/.claude/rules/knowledge-creation.md`.
+brain.
 
 ### 6. Git Commit Discipline
 
 **Atomic commits + Conventional Commits.** Stage specific files by name (never
 `git add -A`). One logical change per commit. Format `type(scope): subject`;
 issue refs in the footer (`Closes #N`). Common types: `feat`, `fix`, `refactor`,
-`chore`, `docs`, `test`, `perf`. Use `/commit` for guided atomic staging. Full
-rules: `3b/.claude/rules/change-discipline.md` § Commit Scope.
+`chore`, `docs`, `test`, `perf`. If using the 3b plugin, `/commit` provides
+guided atomic staging.
 
 **Branch cleanup** — on "cleanup branch" after merge:
 
@@ -87,21 +90,20 @@ If uncertain whether a branch should be deleted, ask first.
 
 **Plan → implementation transition** — on exiting plan mode:
 
-1. **MUST** invoke `/task-starter` BEFORE any edits (handles branch, context,
-   scaffolding).
-2. Only after `/task-starter` completes, proceed with code changes.
+1. **MUST** invoke your task-starter workflow BEFORE any edits (handles branch,
+   context, scaffolding). If using the 3b plugin, this is `/task-starter`.
+2. Only after task-starter completes, proceed with code changes.
 
 **Post-implementation workflow:**
 
-1. **Mid-session commits stay user-initiated.** Use `/commit` for atomic
-   staging; do NOT auto-commit code you just wrote unless the user asks.
-2. **Session-end is the exception.** `/wrap` auto-commits (stage by name, atomic
-   Conventional Commit) and auto-pushes on feature/task branches; asks once on
-   `main`/`master`. Overrides: `no-commit`, `no-push`, `+pr`.
+1. **Mid-session commits stay user-initiated.** Do NOT auto-commit code you
+   just wrote unless the user asks.
+2. **Session-end is the exception.** A `/wrap`-style flow can auto-commit
+   (stage by name, atomic Conventional Commit) and auto-push on feature/task
+   branches; ask once on `main`/`master`.
 3. **Safety confirms required for destructive ops** — force-push,
    `git reset --hard`, amending published commits.
-4. PR creation stays opt-in — `/wrap` does NOT invoke `/pr-creator` unless `+pr`
-   is passed.
+4. PR creation stays opt-in.
 
 ### 7. Scientific Thinking
 
@@ -120,7 +122,7 @@ solutions, or drawing conclusions, apply hypothesis-driven reasoning.
 
 **When to apply:**
 
-- Diagnosing bugs or unexpected behavior (complements Root Cause Verification)
+- Diagnosing bugs or unexpected behavior
 - Choosing between approaches (complements Decision Documentation #4)
 - Making claims about what code does or why something fails
 - Writing knowledge entries or investigation reports
@@ -142,31 +144,16 @@ solutions, or drawing conclusions, apply hypothesis-driven reasoning.
 | Availability | Assuming recent/memorable patterns are universal |
 | Bandwagon    | Preferring popular tools without evaluating fit  |
 
-**Integration with existing principles:**
-
-- **Decision Documentation (#4)** handles WHAT was decided and WHY. Scientific
-  Thinking adds: state the hypothesis first, document assumptions, seek
-  disconfirming evidence.
-- **Root Cause Verification** (3B Change Discipline) IS causal analysis.
-  Scientific Thinking adds: what would disprove this root cause?
-- **Prototype-first** (3B Change Discipline) IS hypothesis testing. Scientific
-  Thinking adds: state expected outcome before prototyping.
-- **`/investigate` skill** already uses hypothesis + confidence. This principle
-  extends that reasoning to ALL tasks, not just investigations.
-- **Friction Capture** IS empirical observation. Scientific Thinking adds:
-  distinguish correlation from causation in pattern detection.
-
 ### 8. Context Efficiency
 
 Context window is the scarcest resource. Prefer pointers over inline content.
 
 **Strategies (priority order):**
 
-1. **Path pointers** — reference `.claude/rules/*.md`, templates, or docs by
-   path instead of duplicating content in CLAUDE.md
+1. **Path pointers** — reference rules files, templates, or docs by path
+   instead of duplicating content in CLAUDE.md
 2. **Fetch on demand** — use WebFetch for external docs (official APIs, best
-   practices) instead of memorizing them; URLs belong in project CLAUDE.md or
-   rules files
+   practices) instead of memorizing them
 3. **Subagent delegation** — offload file-heavy research to subagents so
    findings return as summaries, not raw file contents
 4. **Lazy-loaded skills** — domain knowledge belongs in `.claude/skills/`, not
@@ -178,8 +165,7 @@ exploratory dead ends.
 
 ### 9. Execution Integrity
 
-Session diagnostics across 1200+ sessions reveal four recurring anti-patterns
-that account for most user frustration. Each has a concrete countermeasure.
+Four recurring anti-patterns and their countermeasures:
 
 | Anti-Pattern         | Diagnostic Signal   | Countermeasure                                         |
 | -------------------- | ------------------- | ------------------------------------------------------ |
@@ -213,35 +199,6 @@ misunderstood requirement.
 Files ending in `.me.md` are human-authored seed documents. **NEVER edit a
 `.me.md` file.** Read for context only.
 
-### Buffer (Cross-Session Memory)
-
-Write to buffer IMMEDIATELY when something important happens.
-
-**Location:** `~/dev/personal/3b/.claude/buffer.md`
-
-**Format:**
-
-```text
-## YYYY-MM-DD HH:MM - {project}
-**What:** {one line summary}
-**Why it matters:** {why worth remembering}
-**Details:** {context with 5W1H}
-```
-
-**When to write:** Decisions made, problems solved, patterns discovered, useful
-references found, non-obvious learnings.
-
-### Active Work Status (Cross-Session Dashboard)
-
-Auto-generated dashboards track in-progress tasks, todos, and recently completed
-work. Check at session start for cross-session continuity.
-
-**Location:** `~/dev/personal/3b/ACTIVE-STATUS.md`
-
-Generated by `/wrap` Step 5.7. Read by `/project-context-loader` and
-`/task-starter` automatically. Contains work tasks, personal goals, stale
-alerts, and per-category recently completed items.
-
 ### Communication Style
 
 | DO                             | DO NOT                           |
@@ -249,36 +206,6 @@ alerts, and per-category recently completed items.
 | Acknowledge and correct        | Say "I'm sorry" or "I apologize" |
 | Present facts objectively      | Give excessive praise            |
 | Cool-headed, professional tone | Emotional responses              |
-
-### 3B (Brandon's Binary Brain)
-
-All repos share a centralized knowledge system called **3B**
-(`~/dev/personal/3b`). It is the **single source of truth** for:
-
-| What              | SoT Location in 3B                         | Symlinked As         |
-| ----------------- | ------------------------------------------ | -------------------- |
-| Project CLAUDE.md | `.claude/project-claude/{name}.md`         | `CLAUDE.md`          |
-| Project .mcp.json | `.claude/project-claude/{name}.mcp.json`   | `.mcp.json`          |
-| Project config    | `.claude/prompts/{name}/PROJECT-CONFIG.md` | (read by skills)     |
-| Project docs/     | `projects/{name}/`                         | `docs/` (gitignored) |
-| Global settings   | `.claude/global-claude-setup/`             | `~/.claude/*`        |
-
-**Key behaviors:**
-
-- **Verify before use:** Before any `docs/`-related work, run `ls -la docs/` to
-  check if it exists and whether it is a symlink. If the symlink is broken or
-  missing, ask the user before proceeding — do NOT create a local `docs/`.
-- `docs/` in 3B-connected repos is a **symlink** — gitignored because it points
-  to personal content. Do NOT delete or overwrite the symlink.
-- Not all repos have `docs/` (e.g., forked or experimental repos). When
-  docs-related work is needed in a repo without `docs/`, ask the user whether to
-  connect it to 3B (`/init-3b`) or keep docs local.
-- `CLAUDE.md` in repos is a **symlink** to 3B — edit the source in
-  `3b/.claude/project-claude/`, not the symlink target.
-- `projects/{name}/` holds both docs AND task tracking (`todos.md`, `actives/`,
-  `PROGRESS.md`). Skills like `/wrap` and `/task-starter` read
-  `PROJECT-CONFIG.md` to locate these files.
-- Use `/init-3b` to connect a new repo to this system.
 
 ---
 
@@ -294,43 +221,19 @@ fine as plain text.
 ## Runtime Environment
 
 **Strategy:** asdf for dev language runtimes (version pinning per-project),
-Homebrew for apps and tools. Never use `nvm`, `pyenv`, `rustup`, or other
+Homebrew for apps and tools. Avoid `nvm`, `pyenv`, `rustup`, or other
 single-language managers.
 
-Full version tables (asdf runtimes + brew-managed languages) live in
-`3b/.claude/rules/runtime-environment.md` — auto-loaded when working with
-`.tool-versions`, `Brewfile`, `package.json`, or other runtime config files.
+If using the 3b plugin, full version tables live at
+`plugins/3b/rules/runtime-environment.md`.
 
 ---
 
 ## Repeating Task Tracker
 
 After completing any non-trivial task, check if it's a recurring pattern worth
-automating. Invoke the `/task-tracker` skill (or it runs automatically via
-`/wrap` Step 4.7). Full logic, thresholds, and suggestion flow live in
-`~/.claude/skills/task-tracker/SKILL.md`.
-
----
-
-## Friction Capture
-
-Write `[FRICTION]` tagged entries to the buffer when Claude hits config-related
-friction (wrong assumption, missing rule, permission block). Extraction, pattern
-detection, and improvement proposals run during `/wrap` Step 4.7. Storage:
-`~/.claude/friction-log.json` (active) + `friction-log-archive.json` (resolved).
-Lifecycle rules in `3b/.claude/rules/change-discipline.md` § Friction Lifecycle.
-
----
-
-## External Tool Routing
-
-Policies for installed external tools available across all projects:
-
-- **Firecrawl** (web scraping/search/interact, free tier 1,175 credits) — see
-  `~/dev/personal/3b/.claude/rules/firecrawl-usage.md` for decision matrix
-  (WebFetch vs firecrawl-\* vs playwright vs chrome-devtools) and credit
-  discipline. Default to free tools first; explicit user confirmation required
-  before `firecrawl-crawl` or `firecrawl-download`.
+automating. Storage: `~/.claude/task-tracker.json`. If using the 3b plugin, the
+`/task-tracker` skill (or `/wrap` Step 4.7) automates detection.
 
 ---
 
@@ -339,12 +242,11 @@ Policies for installed external tools available across all projects:
 When compaction runs, preserve:
 
 - File paths touched (edits, creates, deletes)
-- Decision rationale (ADRs, `/investigate` hypotheses, plan.md approvals)
-- Skill invocations with arguments (`/wrap`, `/task-starter`, etc.)
+- Decision rationale (ADRs, investigation hypotheses, plan approvals)
+- Skill invocations with arguments
 - Commit hashes, PR numbers, issue numbers
 - Friction-log entries and corrections
-- Knowledge file paths created or updated (`knowledge/{cat}/{file}.md`)
-- Active task folder state (`projects/*/actives/*/todos.md` progress)
+- Knowledge file paths created or updated
 
 Drop:
 
@@ -354,33 +256,12 @@ Drop:
 
 ---
 
-## Update Log
+## 3B Methodology Extension (opt-in)
 
-| Date       | Rule Added                                               | Reason                                                           |
-| ---------- | -------------------------------------------------------- | ---------------------------------------------------------------- |
-| 2026-04-19 | Compressed principles #1, #2, #3, #5, #6 to pointers     | CLAUDE.md lazy-load SSoT (#17) — ~73 lines/~1K tok/session saved |
-| 2026-04-18 | Diet: Runtime Env → scoped rule, Task Tracker → skill    | Token usage reduction (#13) — ~1,800 tok/session saved           |
-| 2026-04-18 | Friction Capture compressed to 6-line pointer            | Full logic in change-discipline.md § Friction Lifecycle          |
-| 2026-04-18 | Compact Instructions section                             | Smarter auto-compact — preserve file paths, decisions, hashes    |
-| 2026-04-17 | Removed Parallel Task Advisory + Agent Teams (old #7/#8) | ~800–1300 tokens/session saved; `Agent` tool covers parallelism  |
-| 2026-04-16 | Execution Integrity (#9)                                 | claude-doctor diagnostics: edit-thrashing, error-loops, drift    |
-| 2026-04-15 | External Tool Routing section (Firecrawl pointer)        | User opted in to global rule application across all repos        |
-| 2026-04-03 | Plan→impl transition + post-impl workflow (#6)           | Skipped /task-starter and branch creation during F.1 impl        |
-| 2026-03-31 | 3B awareness section                                     | Cross-repo friction: Claude didn't know why docs/ gitignored     |
-| 2026-03-22 | Decision Documentation (#4): planning gate + aim-for-3   | Was retrospective-only; now evaluates options before impl        |
-| 2026-03-12 | Agent Teams: clarify TeamCreate vs Agent tool            | Subagents never split panes; TeamCreate is the only path         |
-| 2026-03-09 | Context Efficiency (#8), compaction instructions         | Pointer-over-inline strategy; fetch-on-demand for docs           |
-| 2026-03-02 | Scientific Thinking (#7), `confidence:` field            | Hypothesis-driven reasoning gaps across all projects             |
-| 2026-02-25 | Git Commit Discipline, Parallel Task Advisory            | Atomic commit gap in global; hook-based team detection           |
-| 2026-02-23 | Universal Principles (8 items), markdownlint compressed  | Promote 5W1H/frontmatter/cross-ref/decisions/Zettelkasten        |
-| 2026-02-12 | Friction Capture                                         | Self-improving config via friction pattern detection             |
-| 2026-02-04 | Repeating Task Tracker                                   | Auto-detect recurring tasks, suggest skills/hooks/commands       |
-| 2026-03-09 | Removed markdownlint table, compressed Mermaid section   | Tooling enforces lint; ~125 lines saved from context load        |
-
-## graphify
-
-- **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge
-  graph. Trigger: `/graphify` When the user types `/graphify`, invoke the Skill
-  tool with `skill: "graphify"` before doing anything else.
+If you adopt the 3B knowledge-management pattern (buffer, active-status
+dashboard, symlinked project docs, centralized rules), append the contents of
+`CLAUDE-3b-extension.md` below this section. It adds buffer, active-work
+status, friction capture, external tool routing, and 3B directory layout
+sections — all parameterized via `$FORGE_3B_ROOT`.
 
 @RTK.md

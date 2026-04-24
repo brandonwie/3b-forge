@@ -84,6 +84,28 @@ grep -cE '~/dev/personal/3b/|3b/knowledge|3b/journals|3b/projects/|buffer\.md|AC
   hardcoded paths.
 - `≥ 12` hits → Tier C, gitignore it (or leave it in the 3B source repo).
 
+## Drift tracking (Wave 2+)
+
+Once a file moves from 3B source into `plugins/3b/` (or `installer/hooks/`)
+as parameterized Tier-A/B content, it becomes a **derivative** of the 3B
+source. The 3B source keeps evolving; the forge copy does not auto-follow.
+
+[`SOURCE-MANIFEST.yaml`](./SOURCE-MANIFEST.yaml) records, for each such
+derivative, the 3B `source_path` + `source_sha` at the time of sync, plus
+the `scrub` rules applied (env vars, placeholders, strip categories). No 3B
+content is stored — only path references and commit SHAs, so the manifest
+is public-safe.
+
+To detect upstream drift, run
+[`../../scripts/check-3b-drift.sh`](../../scripts/check-3b-drift.sh) with
+`$FORGE_3B_ROOT` set. The script lists every entry whose 3B source has
+moved since its recorded SHA. Re-sync the file, re-apply its scrub rules,
+and update the manifest's `source_sha` + `synced_at`.
+
+The [`claude-forge-crosschecker`](./agents/claude-forge-crosschecker.md)
+agent produces this audit in structured-report form via its **Mode 2 —
+Source Drift Check**.
+
 ## Future: un-gitignoring
 
 When the 3B repo itself generalizes its conventions — when `buffer.md`,

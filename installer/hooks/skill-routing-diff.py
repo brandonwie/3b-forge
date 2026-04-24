@@ -11,7 +11,7 @@ Usage:
   python3 skill-routing-diff.py [--claude-md PATH] [--usage PATH]
 
 Defaults:
-  --claude-md  ~/dev/personal/3b/CLAUDE.md
+  --claude-md  $FORGE_3B_ROOT/CLAUDE.md  (required if --claude-md not passed)
   --usage      ~/.claude/skill-usage.json
 """
 import argparse
@@ -57,15 +57,19 @@ def parse_usage(usage_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Skill routing table diff")
-    parser.add_argument(
-        "--claude-md",
-        default=os.path.expanduser("~/dev/personal/3b/CLAUDE.md"),
+    forge_3b_root = os.environ.get("FORGE_3B_ROOT")
+    default_claude_md = (
+        os.path.join(forge_3b_root, "CLAUDE.md") if forge_3b_root else None
     )
+    parser.add_argument("--claude-md", default=default_claude_md)
     parser.add_argument(
         "--usage",
         default=os.path.expanduser("~/.claude/skill-usage.json"),
     )
     args = parser.parse_args()
+
+    if not args.claude_md:
+        parser.error("--claude-md required when FORGE_3B_ROOT is not set")
 
     if not os.path.exists(args.claude_md):
         print(f"Error: {args.claude_md} not found", file=sys.stderr)

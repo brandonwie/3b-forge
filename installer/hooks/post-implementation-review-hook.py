@@ -33,8 +33,8 @@ ENABLED = os.environ.get("CLAUDE_POST_IMPL_REVIEW", "1").lower() not in (
     "0", "false", "no",
 )
 
-# Paths
-THREE_B_PATH = os.path.expanduser("~/dev/personal/3b")
+# Paths. FORGE_3B_ROOT is opt-in; if unset, the 3B-project anti-trigger is disabled.
+THREE_B_PATH = os.environ.get("FORGE_3B_ROOT", "")
 SKILL_USAGE_PATH = os.path.expanduser("~/.claude/skill-usage.json")
 CHECKLIST_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -145,6 +145,8 @@ def is_docs_only(state):
 
 def is_3b_project():
     """Check if CWD is the 3B knowledge management project."""
+    if not THREE_B_PATH:
+        return False
     cwd = os.getcwd()
     try:
         real_cwd = os.path.realpath(cwd)

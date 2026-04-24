@@ -8,8 +8,10 @@ file, target path, and suggested fix.
 Usage:
   python3 knowledge-link-checker.py [--root PATH] [--fix-suggestions]
 
-Defaults:
-  --root  ~/dev/personal/3b
+The root path resolves from (priority order):
+  1. --root CLI argument
+  2. FORGE_3B_ROOT env var
+  3. Otherwise: exit 0 (fail-open; non-3B installs are a no-op).
 """
 import argparse
 import os
@@ -62,7 +64,8 @@ def main():
     parser = argparse.ArgumentParser(description="Knowledge broken link checker")
     parser.add_argument(
         "--root",
-        default=os.path.expanduser("~/dev/personal/3b"),
+        default=os.environ.get("FORGE_3B_ROOT"),
+        help="Knowledge repo root (defaults to $FORGE_3B_ROOT)",
     )
     parser.add_argument(
         "--fix-suggestions",
@@ -70,6 +73,11 @@ def main():
         help="Search for possible correct paths for broken links",
     )
     args = parser.parse_args()
+
+    if not args.root:
+        # No 3B configured — link check is a no-op. Matches the fail-open
+        # contract documented in installer/README.md for sibling hooks.
+        sys.exit(0)
 
     scan_dirs = [
         os.path.join(args.root, "knowledge"),

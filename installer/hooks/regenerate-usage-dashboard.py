@@ -7,14 +7,16 @@ Reads:
 - ~/.claude/skill-usage.json (track-skill-usage.py + track-skill-slash.py output)
 - ~/.claude/settings.json (enabledPlugins inventory source)
 - ~/.claude/plugins/installed_plugins.json (plugin metadata + install paths)
-- ~/dev/personal/3b/.claude/project-claude/*.mcp.json (project MCP servers)
-- ~/dev/personal/3b/.claude/global-claude-setup/skills/ (global skills inventory)
-- ~/dev/personal/3b/projects/3b/reference/plugin-mcp-skill-install-log.md
+- $FORGE_3B_ROOT/.claude/project-claude/*.mcp.json (project MCP servers)
+- $FORGE_3B_ROOT/.claude/global-claude-setup/skills/ (global skills inventory)
+- $FORGE_3B_ROOT/projects/3b/reference/plugin-mcp-skill-install-log.md
   (install dates for verdict computation)
 
 Writes:
-- ~/dev/personal/3b/projects/3b/reference/plugin-mcp-skill-usage.md
+- $FORGE_3B_ROOT/projects/3b/reference/plugin-mcp-skill-usage.md
   (full-file overwrite, atomic)
+
+Requires FORGE_3B_ROOT env var — exits silently if unset.
 
 Design notes:
 - LEFT-JOIN inventory against tracker so zero-usage items surface (the goal)
@@ -41,7 +43,15 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 CONFIG_DIR = Path(os.environ.get("CLAUDE_CONFIG_DIR", os.path.expanduser("~/.claude")))
-THREE_B_PATH = Path(os.path.expanduser("~/dev/personal/3b"))
+
+_forge_3b_root = os.environ.get("FORGE_3B_ROOT")
+if not _forge_3b_root:
+    # 3B opt-in via env var. Unset → dashboard regeneration is a no-op.
+    # Warn to stderr so the skip is observable in CI / --check-stale runs
+    # instead of masquerading as success.
+    sys.stderr.write("[dashboard] FORGE_3B_ROOT unset — skipping\n")
+    sys.exit(0)
+THREE_B_PATH = Path(_forge_3b_root)
 
 PLUGIN_USAGE = CONFIG_DIR / "plugin-usage.json"
 MCP_USAGE = CONFIG_DIR / "mcp-usage.json"

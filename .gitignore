@@ -79,16 +79,9 @@ plugins/3b/rules/_index.md
 plugins/3b/rules/moba-*.md
 plugins/3b/rules/crucio-*.md
 
-# Tier-C agents (Tier-B agents staged locally stay private until parameterized)
-plugins/3b/agents/knowledge-librarian.md
-plugins/3b/agents/context-reviewer.md
-
 # Installer sensitive staging (personal settings, tracker data, work perms)
 installer/settings.json
 installer/settings.local.work.json
 installer/settings.json.bak-*
 installer/task-tracker.json
 installer/commands/init-3b.md
-installer/hooks/profile-sync-hook.py
-installer/hooks/friction-context-hook.py
-installer/hooks/knowledge-staleness-hook.py
