@@ -13,6 +13,39 @@ per plugin.
 ### Harness-level
 
 #### Added
+- 2026-04-24 — **`@claude review` GHA workflow split.** Adds
+  [`.github/workflows/claude-code-review.yml`](./.github/workflows/claude-code-review.yml)
+  — dedicated `issue_comment` handler firing on `@claude review` against PRs
+  only (gated by `github.event.issue.pull_request`). 3b-forge-tuned prompt
+  with 7 review categories (Security, Portability, Plugin Correctness, Shell
+  Quality, Docs, Change Discipline, SSoT Integrity) and do-NOT-flag
+  conventions (symlink `docs/`, verbatim rename history, Tier-B
+  parameterization, macOS realpath fallback, fail-open hooks).
+  `track_progress: true`. Scoped `--allowedTools` to `gh pr comment/diff/view`
+  + inline-comment MCP. Modifies existing
+  [`.github/workflows/claude.yml`](./.github/workflows/claude.yml) to add
+  `!contains(..., '@claude review')` exclusion guard (prevents double-fire)
+  and a token-validation preflight step. Deliberately skips
+  `environment: claude-${{ github.actor }}` gating — unnecessary for a solo
+  personal repo.
+- 2026-04-24 — **Wave 3 SSoT flip tooling (forge PR #3 scope).** Adds
+  [`scripts/flip-to-forge.sh`](./scripts/flip-to-forge.sh) with
+  `--dry-run`/`--execute`/`--rollback` modes. Computes relative symlink
+  targets via `os.path.relpath` so the 3B → forge links survive `$HOME`
+  changes. `--execute` requires clean 3B tree and writes
+  `scripts/.flip-state.json` for rollback reproducibility. Hard allowlist
+  gates the 18 manifest entries; any out-of-manifest path aborts pre-flight.
+  The 3B-side flip is executed with this script AFTER forge PR #3 merges;
+  this release ships only the tooling.
+- 2026-04-24 — **Drift check rewrite for post-flip topology.**
+  [`scripts/check-3b-drift.sh`](./scripts/check-3b-drift.sh) replaces the
+  `git log SHA..HEAD` commit count (meaningless once 3B symlinks into forge)
+  with five topology checks: A symlink integrity, B wrong target, C
+  untracked Tier-A candidates, D reintroduced hardcoded paths, E
+  plugin-reinstall damage. Checks A/B/E activate only when
+  `scripts/.flip-state.json` is present, preserving back-compat with the
+  pre-flip state. Emergency recovery of the old logic:
+  `git show wave2-backup:scripts/check-3b-drift.sh`.
 - 2026-04-24 — **Wave 2 Tier-B parameterization + drift tracking.** `installer/setup.sh`
   rewritten to read the 3B path from `$FORGE_3B_ROOT` (required; fail-fast
   if unset); script-relative path resolution via `${BASH_SOURCE[0]}`; `--dry-run`
@@ -42,10 +75,35 @@ per plugin.
   appending to their installed `CLAUDE.md`.
 
 #### Changed
+- 2026-04-24 — `plugins/3b/PUBLIC-PRIVATE-SPLIT.md` — tier classification
+  is now manifest-driven for shipped files. The content-grep rubric is
+  retained as a candidate-scoring tool for new 3B files being evaluated
+  for migration. Drift section updated to document the five-check
+  topology.
+- 2026-04-24 — `plugins/3b/README.md` — adds Wave 3 SSoT topology mermaid
+  diagram and bumps the status header to v0.0.4.
 - `installer/README.md` — Wave 1 WIP banner removed; environment-variable
   docs added (FORGE_3B_ROOT, FORGE_HOME, FORGE_DOTFILES_LINK,
   FORGE_INSTALL_WORK_PROFILE, FORGE_DRY_RUN); drift-detection section
   added pointing to `scripts/check-3b-drift.sh`.
+
+### `plugins/3b/` v0.0.3 → v0.0.4 (2026-04-24)
+
+#### Changed
+- **Ownership model: Wave 3 SSoT flip.** Forge is now the Single Source
+  of Truth for the 18 manifest entries in `SOURCE-MANIFEST.yaml`. The 3B
+  repo will consume these via relative symlinks after the follow-on
+  3B-side PR runs `scripts/flip-to-forge.sh --execute`. This plugin
+  release ships only the policy + documentation updates; no skill or
+  rule behaviour changes.
+- `PUBLIC-PRIVATE-SPLIT.md` — tier classification moves from a
+  content-grep heuristic to explicit `SOURCE-MANIFEST.yaml` membership.
+  The grep rubric is retained as a candidate-scoring tool for new
+  migrations. Drift section documents the five post-flip integrity
+  checks.
+- `README.md` — adds a mermaid SSoT topology diagram under a new
+  "SSoT topology (Wave 3)" section and bumps the status header to
+  v0.0.4.
 
 ### `plugins/3b/` v0.0.2 → v0.0.3 (2026-04-24)
 
