@@ -4,8 +4,10 @@ Single Source of Truth for the forge. One plugin, many skills, rules, and
 agents. Works across Claude Code, Codex, Gemini CLI, and any future AI agent
 host that can read markdown-based skills.
 
-> **Status:** `v0.0.4` — **pre-release**. Wave 3 SSoT flip landed
-> 2026-04-24; forge owns the 18 manifest entries, 3B consumes via
+> **Status:** `v0.0.4` — **pre-release**. Wave 3 SSoT flip **tooling**
+> landed 2026-04-24 (`flip-to-forge.sh` + refactored `check-3b-drift.sh`).
+> Actual 3B-side flip (`--execute` + consumer symlinks) is a follow-on
+> PR. Post-flip, forge owns the 18 manifest entries and 3B consumes via
 > relative symlink. See [SSoT topology](#ssot-topology-wave-3).
 
 ## Current skills
