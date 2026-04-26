@@ -28,10 +28,14 @@
 # ─────────────────────────────────────────────────────────────────────
 
 version: 1
-synced_at: 2026-04-24
-three_b_head_at_sync: f9c6d19c444ed014ce9eef576c6bd584d5ab1fed
+synced_at: 2026-04-26  # Wave 3 sync — interview skill (11 entries)
+three_b_head_at_sync: c547ebfe57fc9f310974156673116392e37a04c3
 three_b_working_tree_at_sync: dirty  # informational — 3B had uncommitted
-                                     # changes unrelated to Wave 2 sources
+                                     # changes from in-progress Wave 3
+                                     # branch feat/embed-interview-skill;
+                                     # Wave 2 entries still pinned at
+                                     # f9c6d19c (their source_sha values
+                                     # are individually stable per entry)
 
 entries:
   # ── Skills (Wave 2) ─────────────────────────────────────────────────
@@ -131,3 +135,69 @@ entries:
     source_path: .claude/global-claude-setup/scripts/knowledge-staleness-hook.py
     source_sha: f9c6d19c444ed014ce9eef576c6bd584d5ab1fed
     scrub: [env_var:FORGE_3B_ROOT, optional_gate]
+
+  # ── Skills (Wave 3 — interview, 2026-04-26) ─────────────────────────
+  # NOTE: 3B is canonical for Wave 3. Skill copied forge → 3B with
+  # frontmatter expansion (Korean triggers + boundary note vs /clarify),
+  # ${CLAUDE_PLUGIN_ROOT}/agents/X.md → ./agents/X.md path rewrites,
+  # and removal of the dead pointer to plugins/interview-codex/
+  # (directory does not exist in forge as of 2026-04-26).
+  - forge_path: plugins/3b/skills/interview/SKILL.md
+    source_path: .claude/skills/interview/SKILL.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  - forge_path: plugins/3b/skills/interview/references/claude-code-tools.md
+    source_path: .claude/skills/interview/references/claude-code-tools.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  - forge_path: plugins/3b/skills/interview/references/codex-tools.md
+    source_path: .claude/skills/interview/references/codex-tools.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  - forge_path: plugins/3b/skills/interview/references/gemini-tools.md
+    source_path: .claude/skills/interview/references/gemini-tools.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  # ── Agents (Wave 3 — interview perspectives, 2026-04-26) ────────────
+  # NOTE: Forge layout has agents at plugin root (plugins/3b/agents/);
+  # 3B layout nests agents inside the skill folder
+  # (.claude/skills/interview/agents/). Drift script compares content,
+  # not paths — divergent paths are intentional.
+  - forge_path: plugins/3b/agents/socratic-interviewer.md
+    source_path: .claude/skills/interview/agents/socratic-interviewer.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  - forge_path: plugins/3b/agents/researcher.md
+    source_path: .claude/skills/interview/agents/researcher.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  - forge_path: plugins/3b/agents/simplifier.md
+    source_path: .claude/skills/interview/agents/simplifier.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  - forge_path: plugins/3b/agents/architect.md
+    source_path: .claude/skills/interview/agents/architect.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  - forge_path: plugins/3b/agents/breadth-keeper.md
+    source_path: .claude/skills/interview/agents/breadth-keeper.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  - forge_path: plugins/3b/agents/seed-closer.md
+    source_path: .claude/skills/interview/agents/seed-closer.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
+
+  - forge_path: plugins/3b/agents/ontologist.md
+    source_path: .claude/skills/interview/agents/ontologist.md
+    source_sha: c547ebfe57fc9f310974156673116392e37a04c3
+    scrub: []
