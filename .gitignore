@@ -85,3 +85,6 @@ installer/settings.local.work.json
 installer/settings.json.bak-*
 installer/task-tracker.json
 installer/commands/init-3b.md
+.serena/cache/
+graphify-out/
+.code-review-graph/
