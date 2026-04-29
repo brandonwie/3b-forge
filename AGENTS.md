@@ -1,0 +1,1 @@
+/Users/brandonwie/dev/personal/3b/.agents/project-codex/3b-forge.md

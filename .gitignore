@@ -40,7 +40,6 @@ Thumbs.db
 tmp/
 
 # Auto-generated agent context stubs (claude-mem)
-AGENTS.md
 
 # Claude Code per-user settings
 .claude/settings.local.json
